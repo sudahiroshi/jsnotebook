@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Script test</title>
+  <script>
+    window.addEventListener('load', function() {
+      document.getElementById('run').addEventListener('click', function() {
+        var script = document.createElement('script');
+        script.innerHTML = document.getElementById('input').value;
+        document.body.appendChild(script);
+      });
+    });
+  </script>
+</head>
+<body>
+  <textarea id="input"></textarea>
+  <button id="run">Run!</button>
+</body>
+</html>
+
