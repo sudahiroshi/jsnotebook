@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Script test</title>
+  <script>
+    window.addEventListener('load', function() {
+      document.getElementById('run').addEventListener('click', function() {
+        var script = document.createElement('script');
+        script.innerHTML = document.getElementById('input').value;
+        document.body.appendChild(script);
+      });
+    });
+  </script>
+</head>
+<body>
+  <textarea id="input"></textarea>
+  <button id="run">Run!</button>
+  <div id="id1"><p id="foo">foo</p></div>
+  <div id="id2"><p id="foo">bar</p></div>
+  <div id="id3"><p id="foo">baz</p></div>
+
+この状態で、document.querySelector("#id1>#foo")とdocument.querySelector("#id2>#foo")が区別可能。
+
+</body>
+</html>
+
