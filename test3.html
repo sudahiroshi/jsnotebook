@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+<meta charset='utf-8'>
+<script src="showdown.min.js"></script>
+<script src="showdown-table.js"></script>
+<script>
+window.addEventListener('load', function() {
+var docs = document.querySelectorAll( 'md' );
+var conv = new showdown.Converter( {extensions: ['table']} );
+//var conv = new showdown.Converter(  );
+docs.forEach( function( value ) {
+ value.innerHTML = conv.makeHtml( value.innerHTML );
+});
+//new showdown.Converter().makeHtml( document.querySelectorAll('md')[0].text );
+//new showdown.Converter().makeHtml( document.getElementById('md0').innerHTML );
+
+});
+</script>
+<body>
+<md>
+## test
+
+1. test
+1. test2
+1. test3
+
+</md>
+<hr>
+<md>
+## test2
+
+hoge.
+fuga.
+
+test | foo
+==|==
+1 | 2
+3 | 4
+
+</md>
+</body>
+
