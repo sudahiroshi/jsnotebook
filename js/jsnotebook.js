@@ -3,8 +3,9 @@
 var setRun = ( div, element ) => {
     div.addEventListener('click', function() {
         var program = element.innerHTML;
+//console.log( program ); // デバッグ用
         var script = document.createElement('script');
-        script.innerHTML = program.replace( /<br>/g, "" );
+        script.innerHTML = program.replace( /<br>/g, "" ).replace( /&nbsp;/,"");
         document.body.appendChild( script );
     });
 };
