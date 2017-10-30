@@ -13,6 +13,7 @@ test.html | textboxに入力されたJSを実行するサンプル
 test2.html | 
 test3.html | Markdownに対応するための試作（ディレクトリ構造が変わったので動きません）
 test4.html | jsnotebookの記念すべき最初のノートです
+class.html | JavaScriptの基本文法を学ぶ（クラス編）
 
 ### 参考
 [動的にJSを実行する方法](https://qiita.com/w650/items/adb108649a0e2a86f334)
