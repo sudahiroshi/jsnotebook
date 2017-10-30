@@ -4,7 +4,7 @@ var setRun = ( div, element ) => {
     div.addEventListener('click', function() {
         var program = element.innerHTML;
         var script = document.createElement('script');
-        script.innerHTML = program;
+        script.innerHTML = program.replace( /<br>/g, "" );
         document.body.appendChild( script );
     });
 };
