@@ -4,26 +4,22 @@
     <meta charset='utf-8'>
     <link rel="stylesheet" href="./css/styles/default.css">
     <link rel="stylesheet" href="./css/jsnotebook.css">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
     <script src="./js/jsnotebook.js"></script>
 <body>
+<article>
 <jsn-md>
 # JS Notebook
 
-JS Notebookとは，主にJavaScriptの自主学習で使用することを想定した，説明中に挿入されているコードをそのまま実行するノートブックです．
-説明とソースコードと実行結果を比べながら学習でき，さらにソースコードを編集して違いを見ることもできます．
-説明の作成にはMarkdownフォーマットを使用できるので，HTMLをべた書きするのと比べて楽に書けると思います．
+JS Notebookとは，主にJavaScriptの自主学習で使用することを想定した，説明中に挿入されているコードをそのまま実行するノートブックです．説明とソースコードと実行結果を比べながら学習でき，さらにソースコードを編集して違いを見ることもできます．説明の作成にはMarkdownフォーマットを使用できるので，HTMLをべた書きするのと比べて楽に書けると思います．
 </md>
 <hr>
 <md>
 ## 基本的な記述方法
 
-Markup言語よりも簡潔に記述したいとの要望が多いことから，技術者の間で徐々に広まりつつあるのがMarkdownです．
-基本的には，mdタグ内にMarkdownに従って説明文を記述します．
-
-Markdownには方言が多いのでお気をつけください．
-こちではGithub Flavorという方言（GFM : Github Flavored Markdownと呼ばれています）を採用しています．
+Markup言語よりも簡潔に記述したいとの要望が多いことから，技術者の間で徐々に広まりつつあるのがMarkdownです．基本的には，```jsn-md```タグ内にMarkdownに従って説明文を記述します．Markdownには方言が多いのでお気をつけください．こちらではGithub Flavorという方言（GFM : Github Flavored Markdownと呼ばれています）を採用しています．
 
 Markdownの強みは，表も書きやすいことです．
 
@@ -36,19 +32,14 @@ Markdownの強みは，表も書きやすいことです．
 [訳 GitHub Help - GitHub Flavored Markdown](https://qiita.com/qurage/items/a2f3f52c60d7c64b2e08)
 [Markdownで行こう！](https://gist.github.com/wate/7072365)
 
-Markdownに慣れるまでは，Markdownに対応したエディタを利用するのが良いと思われます．
-AtomやSublimeText用のプラグインが配布されており，編集画面とプレビューをウィンドウの左右に分けて表示できます．
-（ただし，**方言が異なる**可能性があります．ご了承ください）
+Markdownに慣れるまでは，Markdownに対応したエディタを利用するのが良いと思われます．AtomやSublimeText用のプラグインが配布されており，編集画面とプレビューをウィンドウの左右に分けて表示できます．（ただし，**方言が異なる**可能性があります．ご了承ください）
 </md>
 <hr>
 <md>
 
 ## プログラムの記述と実行
 
-ソースコードは，Markdownの流儀に従い，開始と終了の行にバッククオートを3個並べます．
-バッククオートを表示する方法が分からないので，書式についてはソースコードを見てください．
-バッククオートに続いてjavascriptと入力しておくと，プログラムと認識してくれます．（なぜか先頭行だけ1文字空いてしまいます．原因は調査中です．1行目はコメント専用としておくことで回避しても良いかな・・・と思っています．）
-また，runnableを入力しておくと，実行ボタンが表示され，クリックすることで実行されます．
+ソースコードは，Markdownの流儀に従い，開始と終了の行にバッククオートを3個並べます．バッククオートを表示する方法が分からないので，書式についてはソースコードを見てください．バッククオートに続いてjavascriptと入力しておくと，プログラムと認識してくれます．（なぜか先頭行だけ1文字空いてしまいます．原因は調査中です．1行目はコメント専用としておくことで回避しても良いかな・・・と思っています．）また，runnableを入力しておくと，実行ボタンが表示され，クリックすることで実行されます．
 
 ```javascript runnable
 var x = 20;
@@ -99,7 +90,7 @@ console.log( " y = " + y );
 console.log( "上のプログラムで代入されたxは " + x + "です" );
 ```
 </jsn-md>
-<hr>
+</article>
 
 
 </body>
