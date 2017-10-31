@@ -15,5 +15,12 @@ test3.html | Markdownに対応するための試作（ディレクトリ構造�
 test4.html | jsnotebookの記念すべき最初のノートです
 class.html | JavaScriptの基本文法を学ぶ（クラス編）
 
+### 使用しているライブラリ
+Markdownの変換にshowdown.jsを使用しています．
+[showdownjs/showdown](https://github.com/showdownjs/showdown)
+
+コードハイライトにhighlite.jsを使用しています．
+[highlight.js](https://highlightjs.org/)
+
 ### 参考
 [動的にJSを実行する方法](https://qiita.com/w650/items/adb108649a0e2a86f334)
