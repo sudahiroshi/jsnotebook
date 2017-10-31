@@ -2,6 +2,7 @@
 // Run（実行）ボタンへのイベントを付加するメソッド
 var setRun2 = ( div, element ) => {
     div.addEventListener('click', function() {
+        output = element.parentNode.lastElementChild;
         var program = element.innerHTML;
 //console.log( program ); // デバッグ用
         var script = document.createElement('script');
@@ -15,6 +16,7 @@ var setRun2 = ( div, element ) => {
 // Run（実行）ボタンへのイベントを付加するメソッド
 var setRun = ( div, element ) => {
     div.addEventListener('click', function() {
+        output = element.parentNode.lastElementChild;
         var program = element.innerHTML;
 //console.log( program ); // デバッグ用
         var script = program
@@ -27,13 +29,15 @@ var setRun = ( div, element ) => {
 // Once（一度だけ実行）ボタンへのイベントを付加するメソッド
 var setOnce = ( div, element ) => {
     div.addEventListener('click', function() {
+        output = element.parentNode.lastElementChild;
         var program = element.innerHTML;
 //console.log( program ); // デバッグ用
-        var script = program
+        var script = document.createElement('script');
+        script.innerHTML = program
             .replace( /<br>/g, "\r\n" )
             .replace( /&nbsp;/,"");;
-        eval( script );
-        console.log( div );
+        //eval( script );
+        document.body.appendChild( script );
         div.disabled = true;
     });
 };
@@ -41,6 +45,7 @@ var setOnce = ( div, element ) => {
 // Sandbox（実行）ボタンへのイベントを付加するメソッド
 var setSandbox = ( div, element ) => {
     div.addEventListener('click', function() {
+        output = element.parentNode.lastElementChild;
         var program = element.innerHTML;
 //console.log( program ); // デバッグ用
         var script = "(function(){" + program
@@ -54,6 +59,13 @@ console.log( script );
 
 window.addEventListener('load', function() {
     showdown.setFlavor('github');
+    
+    output = undefined;
+    console.log = ( value ) =>  {
+        if( output != undefined ) {
+            output.innerHTML += value + "<br>";
+        }
+    }
 
     // mdタグを拾ってMarkdownへの変換処理をおこなう
     var docs = document.querySelectorAll( 'jsn-md' );
@@ -75,7 +87,7 @@ window.addEventListener('load', function() {
     pres.forEach( function( value ) {
         var btn = document.createElement('button');
         btn.textContent = "Run";
-        setRun( btn, value );
+        setRun2( btn, value );
         btn.contentEditable = false;
         let parent = value.parentNode;
         parent.appendChild( document.createElement('p') );
@@ -122,7 +134,7 @@ window.addEventListener('load', function() {
         value.contentEditable = true;
     });
 
-    // hlクラスの付いたタグに色付けを行う
+    // hlクラスの付いた要素にSyntaxHighliteを行う
     var code = document.querySelectorAll( 'pre code.hl, pre code.html' );
     code.forEach( function( block ) {
         block.innerHTML = block.innerHTML.replace( /&amp;/g, '&' ); 
