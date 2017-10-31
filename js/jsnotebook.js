@@ -19,7 +19,35 @@ var setRun = ( div, element ) => {
 //console.log( program ); // デバッグ用
         var script = program
             .replace( /<br>/g, "\r\n" )
-          .replace( /&nbsp;/,"");;
+            .replace( /&nbsp;/,"");;
+        eval( script );
+    });
+};
+
+// Once（一度だけ実行）ボタンへのイベントを付加するメソッド
+var setOnce = ( div, element ) => {
+    div.addEventListener('click', function() {
+        var program = element.innerHTML;
+//console.log( program ); // デバッグ用
+        var script = program
+            .replace( /<br>/g, "\r\n" )
+            .replace( /&nbsp;/,"");;
+        eval( script );
+        console.log( div );
+        div.disabled = true;
+    });
+};
+
+// Sandbox（実行）ボタンへのイベントを付加するメソッド
+var setSandbox = ( div, element ) => {
+    div.addEventListener('click', function() {
+        var program = element.innerHTML;
+//console.log( program ); // デバッグ用
+        var script = "(function(){" + program
+            .replace( /<br>/g, "\r\n" )
+            .replace( /&nbsp;/,"")
+            + "})()";;
+console.log( script );
         eval( script );
     });
 };
@@ -56,7 +84,37 @@ window.addEventListener('load', function() {
         parent.style.background = "#f8fcfc";
         parent.style.border = "solid 1px #80a0a0";
     });
+    
+     // onceクラスの付いた要素に実行ボタンを付ける
+    var pres = document.querySelectorAll( '.once' );
+    pres.forEach( function( value ) {
+        var btn = document.createElement('button');
+        btn.textContent = "Once";
+        setOnce( btn, value );
+        btn.contentEditable = false;
+        let parent = value.parentNode;
+        parent.appendChild( document.createElement('p') );
+        parent.appendChild( btn );
+        parent.appendChild( document.createElement('pre') );
+        parent.style.background = "#f8fcfc";
+        parent.style.border = "solid 1px #80a0a0";
+    });
 
+     // onceクラスの付いた要素に実行ボタンを付ける
+    var pres = document.querySelectorAll( '.sandbox' );
+    pres.forEach( function( value ) {
+        var btn = document.createElement('button');
+        btn.textContent = "Sandbox";
+        setSandbox( btn, value );
+        btn.contentEditable = false;
+        let parent = value.parentNode;
+        parent.appendChild( document.createElement('p') );
+        parent.appendChild( btn );
+        parent.appendChild( document.createElement('pre') );
+        parent.style.background = "#f8fcfc";
+        parent.style.border = "solid 1px #80a0a0";
+    });
+    
     // editableクラスの付いた要素を編集可能にする
     var edit = document.querySelectorAll( '.editable' );
     edit.forEach( function( value ) {
