@@ -7,7 +7,9 @@ var jnsPrint = ( element, string ) => {
 }
 
 var jnsError = ( element, string ) => {
-    element.innerHTML += "<span class='err'>" + string + "</span><br>";
+    if( element.className.indexOf( 'console' ) != -1 ) {
+    	element.innerHTML += "<span class='err'>" + string + "</span><br>";
+    }
 }
 
 // Run（実行）ボタンへのイベントを付加するメソッド
