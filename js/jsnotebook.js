@@ -21,7 +21,7 @@ var setRun2 = ( div, element ) => {
         var script = document.createElement('script');
         script.innerHTML = program
             .replace( /<br>/g, "\r\n" )
-            .replace( /&nbsp;/,"")
+            .replace( /&nbsp;/," ")
             .replace( /console.log\(/g, "jnsPrint( output," );
         document.body.appendChild( script );
     });
@@ -38,7 +38,7 @@ var setRun = function( div, element )  {
         var dummyEval = eval;
         var script = program
             .replace( /<br>/g, "\r\n" )
-            .replace( /&nbsp;/g,"")
+            .replace( /&nbsp;/g," ").replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>'  )
             .replace( /console.log\(/g, "jnsPrint( output," );
 /*        if( output.className.indexOf( 'console' ) != -1 ) {
             script = script.replace( /console.log\(/g, "jnsPrint( output," );
@@ -63,7 +63,7 @@ var setOnce = ( div, element ) => {
         //var script = document.createElement('script');
         var script = program
             .replace( /<br>/g, "\r\n" )
-            .replace( /&nbsp;/g,"")
+            .replace( /&nbsp;/g," ")
             .replace( /console.log\(/g, "jnsPrint( output," );
  //console.log( output );
         try {
@@ -79,15 +79,21 @@ var setOnce = ( div, element ) => {
 // Sandbox（実行）ボタンへのイベントを付加するメソッド
 var setSandbox = ( div, element ) => {
     div.addEventListener('click', function() {
-        var output = element.parentNode.lastElementChild;
+      output = element.parentNode.lastElementChild;
         var program = element.innerHTML;
 //console.log( program ); // デバッグ用
+        var dummyEval = eval;
         var script = "(function(){" + program
                 .replace( /<br>/g, "\r\n" )
-                .replace( /&nbsp;/,"")
+                .replace( /&nbsp;/," ")
+                .replace( /console.log\(/g, "jnsPrint( output," )
             + "})()";;
-        console.log( script );
-        eval( script );
+        try {
+            dummyEval( script );
+        } catch (e) {
+            jnsError( output, e );
+            throw( e );
+        }
     });
 };
 
