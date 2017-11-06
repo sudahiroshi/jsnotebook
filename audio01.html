@@ -97,13 +97,13 @@ WebAudioAPIでは，音に様々な加工を施すことができます．まず
 // Max音量：1秒間，1/2音量：1秒間
 var audioCtx = new AudioContext();
 var oscNode = audioCtx.createOscillator();
-var volume = audioCtx.createGain();
-oscNode.connect( volume );
-volume.connect( audioCtx.destination );
+var gainNode = audioCtx.createGain();
+oscNode.connect( gainNode );
+gainNode.connect( audioCtx.destination );
 oscNode.start();
 
 setTimeout( function(){
-volume.gain.value = 0.5;
+gainNode.gain.value = 0.5;
 }, 1000 );
 setTimeout( function(){
 oscNode.stop();
@@ -127,7 +127,7 @@ var gainNode = audioCtx.createGain();
 
 ```javascript runnable editable
 // オシレータノード　→　ゲインノード　→　出力
-oscNode.connect( volume );
+oscNode.connect( gainNode );
 gainNode.connect( audioCtx.destination );
 osc.start();
 ```
