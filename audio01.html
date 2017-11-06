@@ -27,10 +27,10 @@ WebAudioを使って音を鳴らす
 ```javascript runnable editable
 // 音を出す
 var audioCtx = new AudioContext();
-var osc = audioCtx.createOscillator();
-osc.connect( audioCtx.destination );
-osc.start();
-setTimeout( function(){ osc.stop() }, 1000 );
+var oscNode = audioCtx.createOscillator();
+oscNode.connect( audioCtx.destination );
+oscNode.start();
+setTimeout( function(){ oscNode.stop() }, 1000 );
 ```
 
 ## 基本的な文法
@@ -48,32 +48,32 @@ var audioCtx = new AudioContext();
 console.log( audioCtx );
 ```
 
-次にオシレータ（発振回路）を初期化します．WebAudioAPIでは音源としてオシレータや配列の内容（サンプリングした波形や合成した波形）を使用することができます．
+次にオシレータ（発振回路）を初期化し,変数oscNodeに代入します．ノードとは,WebAudioAPIで使用される，機能を持った部品のことです．WebAudioAPIでは音源としてオシレータや配列の内容（サンプリングした波形や合成した波形）を使用することができます．
 
 ```javascript once editable console
 // オシレータの初期化
-var osc = audioCtx.createOscillator();
+var oscNode = audioCtx.createOscillator();
 
-console.log( osc );
+console.log( oscNode );
 ```
 
 続いて，オシレータを出力先（destination）に接続します．ハードウェアを配線することをイメージしてください．
 
 ```javascript once editable console
-osc.connect(audioCtx.destination);
-console.log( osc );
+oscNode.connect(audioCtx.destination);
+console.log( oscNode );
 ```
 
 オシレータの発振を開始すると音が鳴ります．
 
 ```javascript runnable editable 
-osc.start();
+oscNode.start();
 ```
 
 放っておくとずっと音が鳴ります．以下のようにしてオシレータを止めましょう．
 
 ```javascript runnable editable
-osc.stop();
+oscNode.stop();
 ```
 
 最初に示したソースコードでは，1秒後にオシレータの発振を止めるようにしていました．その部分を抜き出すと以下のようになります．
@@ -81,7 +81,7 @@ osc.stop();
 ```javascript hl
 setTimeout(
  　function(){
-　　osc.stop();
+　　oscNode.stop();
 　}, 1000
 );
 ```
@@ -96,17 +96,17 @@ WebAudioAPIでは，音に様々な加工を施すことができます．まず
 ```javascript runnable editable
 // Max音量：1秒間，1/2音量：1秒間
 var audioCtx = new AudioContext();
-var osc = audioCtx.createOscillator();
+var oscNode = audioCtx.createOscillator();
 var volume = audioCtx.createGain();
-osc.connect( volume );
+oscNode.connect( volume );
 volume.connect( audioCtx.destination );
-osc.start();
+oscNode.start();
 
 setTimeout( function(){
 volume.gain.value = 0.5;
 }, 1000 );
 setTimeout( function(){
-osc.stop();
+oscNode.stop();
 }, 2000 );
 ```
 
@@ -114,21 +114,21 @@ osc.stop();
 
 音量を変更するためには，ゲインノードを使用します．WebAudioの各ノードは，ソースノードを除いて接続することができます．ここでは，オシレータノード→ゲインノード→出力という順で接続していきます．
 
-それではプログラムを見ていきましょう．まずはコンテキスト，オシレータノード，ゲインノードを初期化します．ゲインノードは（ちょっと分かりづらいですが）gainという変数に格納しています．
+それではプログラムを見ていきましょう．まずはコンテキスト，オシレータノード，ゲインノードを初期化します．ゲインノードはgainNodeという変数に格納しています．
 
 ```javascript runnable editable
 // コンテクスト，オシレータノード，ゲインノードの初期化
 var audioCtx = new AudioContext();
-var osc = audioCtx.createOscillator();
-var volume = audioCtx.createGain();
+var oscNode = audioCtx.createOscillator();
+var gainNode = audioCtx.createGain();
 ```
 
 続いて，各ノードを接続していきます．
 
 ```javascript runnable editable
 // オシレータノード　→　ゲインノード　→　出力
-osc.connect( volume );
-volume.connect( audioCtx.destination );
+oscNode.connect( volume );
+gainNode.connect( audioCtx.destination );
 osc.start();
 ```
 
@@ -136,13 +136,13 @@ osc.start();
 
 ```javascript runnable editable
 // 音量を1/2に
-volume.gain.value = 0.5;
+gainNode.gain.value = 0.5;
 ```
 
 放っておくとずっと音が鳴ります．以下のようにしてオシレータを止めましょう．
 
 ```javascript runnable editable
-osc.stop();
+oscNode.stop();
 ```
 </jsn-md>
 </article>
