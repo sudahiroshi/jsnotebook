@@ -220,7 +220,7 @@ HTMLファイルから外部JavaScriptを読み込むためには以下の6行�
 
 ### クラス化してみる
 
-次にプログラム本体に手を入れ，クラス化します．クラス名はDrawingにしておきます．メソッドはコンストラクタ（constructor），イベントの設定（set_event），点描画（drawPoint）の3つです．クラス化したことに伴い，このように処理を細分化することで，メンテナンスや再利用が容易になります．
+次にプログラム本体に手を入れ，クラス化します．クラス名は```Drawing```にしておきます．メソッドはコンストラクタ（```constructor```），イベントの設定（```set_event```），点描画（```drawPoint```）の3つです．クラス化したことに伴い，このように処理を細分化することで，メンテナンスや再利用が容易になります．
 
 
 ```javascript hl 
@@ -238,7 +238,7 @@ class Drawing {
       var rect = ev.target.getBoundingClientRect();
       var x = ev.clientX - rect.left;
       var y = ev.clientY - rect.top;
-      drawPoint( x, y );
+      this.drawPoint( x, y );
     });
   }
   
