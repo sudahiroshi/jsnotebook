@@ -129,7 +129,7 @@ var gainNode = audioCtx.createGain();
 // オシレータノード　→　ゲインノード　→　出力
 oscNode.connect( gainNode );
 gainNode.connect( audioCtx.destination );
-osc.start();
+oscNode.start();
 ```
 
 音量を変更したい所で，ゲインノードの持つパラメータ**gain**の**value**を変更します．ここでは0.5にしています．
