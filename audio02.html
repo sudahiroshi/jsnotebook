@@ -20,19 +20,20 @@ WebAudioで和音を作る
 
 ## 和音を鳴らそう
 
-和音を鳴らすためには，オシレータノードを複数作成し，それぞれに異なる周波数を設定して鳴らせば良いです．
+和音を鳴らすためには，オシレータノードを複数作成し，それぞれに異なる周波数を設定して鳴らします．簡単なサンプルを以下に示します．このサンプルでは，ド・ミ・ソの和音を2秒間鳴らします．
+
+※ここでは12平均律を採用しています．細かく調整したい方は周波数を微調整してください．
 
 ```javascript runnable editable
 // オシレータを3つ作ってドミソの和音を鳴らす
 
-var AudioContext = window.AudioContext;
 var audioCtx = new AudioContext();
 var osc1 = audioCtx.createOscillator();
 var osc2 = audioCtx.createOscillator();
 var osc3 = audioCtx.createOscillator();
-osc1.frequency.value = 261.6; // ド
-osc2.frequency.value = 329.6; // ミ
-osc3.frequency.value = 392.0; // ソ
+osc1.frequency.value = 440 * Math.pow( 2, -9/12 ); // ド：約261.6Hz
+osc2.frequency.value = 440 * Math.pow( 2, -5/12 ); // ミ：約329.6Hz
+osc3.frequency.value = 440 * Math.pow( 2, -2/12 ); // ソ：約392.0Hz
 osc1.connect( audioCtx.destination );
 osc2.connect( audioCtx.destination );
 osc3.connect( audioCtx.destination );
@@ -46,104 +47,90 @@ osc2.stop();
 osc3.stop();
 }, 2000 );
 ```
-```javascript runnable editable
-// オシレータを2つ作ってドミソの和音を鳴らす
 
-var AudioContext = window.AudioContext;
+それではプログラムを分割してみていきます．
+
+まずはコンテクスト，オシレータノード3個を初期化します．
+
+```javascript runnable editable
+// コンテクストとオシレータノード3個の初期化
+
 var audioCtx = new AudioContext();
 var osc1 = audioCtx.createOscillator();
 var osc2 = audioCtx.createOscillator();
-osc1.frequency.value = 1000; // あ
-osc2.frequency.value = 1500;
-osc1.connect( audioCtx.destination );
-osc2.connect( audioCtx.destination );
-
-osc1.start();
-osc2.start();
-// い
-setTimeout( function(){
-osc1.frequency.value = 300;
-osc2.frequency.value = 2500;
-}, 1000 );
-// う
-setTimeout( function(){
-osc1.frequency.value = 350;
-osc2.frequency.value = 1500;
-}, 2000 );
-//え
-setTimeout( function(){
-osc1.frequency.value = 550;
-osc2.frequency.value = 2100;
-}, 3000 );
-//お
-setTimeout( function(){
-osc1.frequency.value = 500;
-osc2.frequency.value = 900;
-}, 4000 );
-setTimeout( function(){
-osc1.stop();
-osc2.stop();
-}, 5000 );
+var osc3 = audioCtx.createOscillator();
 ```
+
+次に，各オシレータにそれぞれ異なる周波数を設定します．
+
+```javascript runnable editable console
+// f = 440 * 2^(d/12)で計算しています
+osc1.frequency.value = 440 * Math.pow( 2, -9/12 ); // ド：約261.6Hz
+console.log( osc1.frequency.value + "Hz" );
+osc2.frequency.value = 440 * Math.pow( 2, -5/12 ); // ミ：約329.6Hz
+console.log( osc2.frequency.value + "Hz" );
+osc3.frequency.value = 440 * Math.pow( 2, -2/12 ); // ソ：約392.0Hz
+console.log( osc3.frequency.value + "Hz" );
+```
+
+続いてオシレータノードを出力先に接続します．
+
 ```javascript runnable editable
-// オシレータを2つ作ってドミソの和音を鳴らす
-
-var AudioContext = window.AudioContext;
-var audioCtx = new AudioContext();
-var osc1 = audioCtx.createOscillator();
-var osc2 = audioCtx.createOscillator();
-osc1.type = "sawtooth";
-osc2.type = "sawtooth";
-osc1.frequency.value = 750; // あ
-osc2.frequency.value = 1250;
 osc1.connect( audioCtx.destination );
 osc2.connect( audioCtx.destination );
+osc3.connect( audioCtx.destination );
+```
 
+鳴らします．
+
+```javascript runnable editable
 osc1.start();
 osc2.start();
-// い
-setTimeout( function(){
-osc1.frequency.value = 250;
-osc2.frequency.value = 2625;
-}, 1000 );
-// う
-setTimeout( function(){
-osc1.frequency.value = 375;
-osc2.frequency.value = 1500;
-}, 2000 );
-//え
-setTimeout( function(){
-osc1.frequency.value = 620;
-osc2.frequency.value = 2500;
-}, 3000 );
-//お
-setTimeout( function(){
-osc1.frequency.value = 500;
-osc2.frequency.value = 1000;
-}, 4000 );
-setTimeout( function(){
-osc1.stop();
-osc2.stop();
-}, 5000 );
+osc3.start();
 ```
+
 放っておくとずっと音が鳴ります．以下のようにして止めましょう．
 
 ```javascript runnable editable
-osc.stop();
+osc1.stop();
+osc2.stop();
+osc3.stop();
 ```
 
-ここまでのソースコードを連結したものを以下に示します．なお，以下のコードでは音を鳴らし始めてから1秒後に音を止めるコードも入れてあります．
+## 矩形波を合成する
 
-注意点として，WebブラウザによってAudioContextの初期化回数が制限されていることです．つまり，以下のコードを何回も実行するとエラーで止まります．
+オシレータノードをゲインノードに接続して音量を調整することも可能です．また，各オシレータノードを別々のゲインノードに接続すれば，周波数ごとの音量を調整可能です．つまり，矩形波や三角波を合成することも簡単に行なえます．
+
+矩形波を合成するためには，1/m sin( mπ )：ただしm=2n+1とするを計算し，足し合わせれば良いです．それをプログラムにしたものを以下に示します．そこで，オシレータノードとゲインノードを配列oscとampに格納します．
 
 ```javascript runnable editable
-// 音を出す
-var AudioContext = window.AudioContext || window.webkitAudioContext;
+// 矩形波を合成する
+
 var audioCtx = new AudioContext();
-var osc = audioCtx.createOscillator();
-osc.connect(audioCtx.destination);
-osc.start();
-setTimeout( function(){ osc.stop() }, 1000 );
+var number = 20; // 20個の周波数について計算する
+var osc = new Array( number ); // 20個分のオシレータノード
+var amp = new Array( number ); // 20個分のゲインノード
+for( var i=0; i< number; i++ ) { 
+    osc[i] = audioCtx.createOscillator(); // オシレータノードの初期化
+    amp[i] = audioCtx.createGain(); // ゲインノードの初期化
+    var j = i*2+1; // 周波数と振幅のためのパラメータ
+    osc[i].frequency.value = 440 * j; // 周波数
+    amp[i].gain.value = 1.0/j; // 振幅
+    
+    // オシレータノード20個　→　ゲインノード20個　→　出力先
+    osc[i].connect( amp[i] );
+    amp[i].connect( audioCtx.destination );
+}
+
+for( var i=0; i< number; i++ ) {
+    osc[i].start();
+}    
+
+setTimeout( function(){
+for( var i=0; i< number; i++ ) {
+    osc[i].stop();
+}   
+}, 2000 );
 ```
 
 </jsn-md>
