@@ -1,19 +1,16 @@
 jsnotebook
 ===============
 
-JS Notebookとは，主にJavaScriptの自主学習で使用することを想定した，説明中に挿入されているコードをそのまま実行するノートブックです．
-説明とソースコードと実行結果を比べながら学習でき，さらにソースコードを編集して違いを見ることもできます．
-説明の作成にはMarkdownフォーマットを使用できるので，HTMLをべた書きするのと比べて楽に書けると思います．
+JS Notebookとは，主にJavaScriptの自主学習で使用することを想定した，説明中に挿入されているコードをそのまま実行するノートブックです．説明とソースコードと実行結果を比べながら学習でき，さらにソースコードを編集して違いを見ることもできます．説明の作成にはMarkdownフォーマットを使用できるので，HTMLをべた書きするのと比べて楽に書けると思います．
 
 ### ファイルの説明
 
 ファイル名 | 説明
 --|--
-test.html | textboxに入力されたJSを実行するサンプル
-test2.html | 
-test3.html | Markdownに対応するための試作（ディレクトリ構造が変わったので動きません）
-test4.html | jsnotebookの記念すべき最初のノートです
-class.html | JavaScriptの基本文法を学ぶ（クラス編）
+index.html | 書式の説明
+canvas.html | CanvasAPIの使い方
+audio01.html | WebAudioAPIの使い方(1)
+audio02.html | WebAudioAPIの使い方(2)
 
 ### 使用しているライブラリ
 Markdownの変換にshowdown.jsを使用しています．
