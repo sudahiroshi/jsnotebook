@@ -4,7 +4,6 @@
     <meta charset='utf-8'>
     <link rel="stylesheet" href="./css/styles/default.css">
     <link rel="stylesheet" href="./css/jsnotebook.css">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
     <script src="./js/jsnotebook.js"></script>
@@ -16,7 +15,7 @@ WebAudioで和音を作る
 
 ## はじめに
 
-この文書は，WebAudioAPIの簡単なintroductionです．
+WebAudioAPIの持つsin波を使って，様々な音を合成してみましょう．
 
 ## 和音を鳴らそう
 
@@ -48,8 +47,9 @@ osc3.stop();
 }, 2000 );
 ```
 
-それではプログラムを分割してみていきます．
+それではプログラムを分割していきます．
 
+<div class="group01">
 まずはコンテクスト，オシレータノード3個を初期化します．
 
 ```javascript runnable editable
@@ -97,11 +97,13 @@ osc2.stop();
 osc3.stop();
 ```
 
+</div>
+
 ## 矩形波を合成する
 
 オシレータノードをゲインノードに接続して音量を調整することも可能です．また，各オシレータノードを別々のゲインノードに接続すれば，周波数ごとの音量を調整可能です．つまり，矩形波や三角波を合成することも簡単に行なえます．
 
-矩形波を合成するためには，1/m sin( mπ )：ただしm=2n+1とするを計算し，足し合わせれば良いです．それをプログラムにしたものを以下に示します．そこで，オシレータノードとゲインノードを配列oscとampに格納します．
+矩形波を合成するためには，「f(m) = 1/m sin( mπ )：ただしm=2n+1とする」を計算し，足し合わせれば良いです．それをプログラムにしたものを以下に示します．そこで，オシレータノードとゲインノードを配列oscとampに格納します．
 
 ```javascript runnable editable
 // 矩形波を合成する
@@ -113,13 +115,17 @@ var amp = new Array( number ); // 20個分のゲインノード
 for( var i=0; i< number; i++ ) { 
     osc[i] = audioCtx.createOscillator(); // オシレータノードの初期化
     amp[i] = audioCtx.createGain(); // ゲインノードの初期化
-    var j = i*2+1; // 周波数と振幅のためのパラメータ
-    osc[i].frequency.value = 440 * j; // 周波数
-    amp[i].gain.value = 1.0/j; // 振幅
     
     // オシレータノード20個　→　ゲインノード20個　→　出力先
     osc[i].connect( amp[i] );
     amp[i].connect( audioCtx.destination );
+}
+
+// 周波数と振幅を調整して矩形波にする
+for( var i=0; i< number; i++ ) { 
+    var j = i*2+1; // 周波数と振幅のためのパラメータ
+    osc[i].frequency.value = 440 * j; // 周波数
+    amp[i].gain.value = 1.0/j; // 振幅
 }
 
 for( var i=0; i< number; i++ ) {
@@ -132,6 +138,130 @@ for( var i=0; i< number; i++ ) {
 }   
 }, 2000 );
 ```
+
+それでは分割してみていきます．
+<div class="group01">
+
+まずはコンテクストとオシレータノード，ゲインノードの初期化です．続けて，オシレータノード→ゲインノード→出力先の接続を行います．
+
+20個分の周波数を合成するため，配列を使用しています．JavaScriptでは，配列の宣言にnew Array( 要素数)を使用します．
+
+```javascript runnable editable
+// 矩形波を合成する
+
+var audioCtx = new AudioContext();
+var number = 20; // 20個の周波数について計算する
+var osc = new Array( number ); // 20個分のオシレータノード
+var amp = new Array( number ); // 20個分のゲインノード
+for( var i=0; i< number; i++ ) { 
+    osc[i] = audioCtx.createOscillator(); // オシレータノードの初期化
+    amp[i] = audioCtx.createGain(); // ゲインノードの初期化
+    
+    // オシレータノード20個　→　ゲインノード20個　→　出力先
+    osc[i].connect( amp[i] );
+    amp[i].connect( audioCtx.destination );
+}
+```
+
+続いてf(m) = 1/m sin( mπ )：ただしm=2n+1とする」を順次計算します．具体的には周波数と振幅を設定します．
+
+```javascript runnable editable
+// 周波数と振幅を調整して矩形波にする
+
+for( var i=0; i< number; i++ ) { 
+    var j = i*2+1; // 周波数と振幅のためのパラメータ
+    osc[i].frequency.value = 440 * j; // 周波数
+    amp[i].gain.value = 1.0/j; // 振幅
+}
+```
+
+再生します．
+```javascript runnable editable
+for( var i=0; i< number; i++ ) { osc[i].start(); }    
+```
+
+止めます．
+```javascritp runnable editable
+for( var i=0; i< number; i++ ) { osc[i].stop(); }   
+```
+</div>
+
+## 楽器音を合成する
+
+楽器音を構成するスペクトルは一般的に複雑ですが，おおよその音色で良ければ単純なスペクトルで表すことが可能です．ここでは，以下の4つの楽器音（に近い音）を合成してみましょう．
+
+楽器 | 特徴
+--|--
+バイオリン | 高い周波数成分まで含まれる
+フルート | 低めの周波数成分のみで構成される
+クラリネット | 奇数倍音で構成される
+ピアノ | 偶数倍音で構成される
+
+```javascript once editable
+// ここは1回だけ実行してください
+var audioCtx = new AudioContext();
+```
+
+次に，合成音を作成します．下の枠内は，上から順に実行してください．何度も実行して音の違いを確認してください．
+<div class = "group01">
+
+基準となる音を合成します．
+
+```javascript runnable editable
+// 事前準備
+var number = 20; // 20個の周波数について計算する
+var osc = new Array( number ); // 20個分のオシレータノード
+var amp = new Array( number ); // 20個分のゲインノード
+for( var i=1; i< number; i++ ) { 
+osc[i] = audioCtx.createOscillator(); // オシレータノードの初期化
+amp[i] = audioCtx.createGain(); // ゲインノードの初期化
+osc[i].frequency.value = (440 * i); // 周波数
+amp[i].gain.value = 1.0/i; // 振幅
+
+// オシレータノード20個　→　ゲインノード20個　→　出力先
+osc[i].connect( amp[i] );
+amp[i].connect( audioCtx.destination );
+}
+```
+下の枠内は，どれか1つだけ実行してください．for文のパラメータを変更することでそれぞれの楽器に必要な周波数のみを残しています．
+
+または1つも実行しなければバイオリンの音になります．
+
+<div class = "group02">
+```javascript runnable editable
+// 偶数成分をカット：クラリネットのような音色
+for( var i=2; i< number; i+=2 ) {
+  amp[i].gain.value = 0;
+}
+```
+
+```javascript runnable editable
+// 奇数成分をカット：ピアノのような音色
+for( var i=3; i< number; i+=2 ) {
+  amp[i].gain.value = 0;
+}
+```
+
+```javascript runnable editable
+// 高周波数成分をカット：フルートのような音色
+for( var i=6; i< number; i++ ) {
+  amp[i].gain.value = 0;
+}
+```
+
+</div>
+
+音を鳴らします．
+```javascript runnable editable
+for( var i=1; i< number; i++ ) { osc[i].start(); } 
+```
+
+止めます．
+```javascript runnable editable
+for( var i=1; i< number; i++ ) { osc[i].stop(); } 
+```
+
+</div>
 
 </jsn-md>
 </article>
