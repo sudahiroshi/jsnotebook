@@ -26,6 +26,7 @@ WebAudioAPIの持つsin波を使って，様々な音を合成してみましょ
 ```javascript runnable editable
 // オシレータを3つ作ってドミソの和音を鳴らす
 
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 var osc1 = audioCtx.createOscillator();
 var osc2 = audioCtx.createOscillator();
@@ -55,6 +56,7 @@ osc3.stop();
 ```javascript runnable editable
 // コンテクストとオシレータノード3個の初期化
 
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 var osc1 = audioCtx.createOscillator();
 var osc2 = audioCtx.createOscillator();
@@ -149,6 +151,7 @@ for( var i=0; i< number; i++ ) {
 ```javascript runnable editable
 // 矩形波を合成する
 
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 var number = 20; // 20個の周波数について計算する
 var osc = new Array( number ); // 20個分のオシレータノード
@@ -199,6 +202,7 @@ for( var i=0; i< number; i++ ) { osc[i].stop(); }
 
 ```javascript once editable
 // ここは1回だけ実行してください
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 ```
 

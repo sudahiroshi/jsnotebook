@@ -26,6 +26,7 @@ WebAudioを使って音を鳴らす
 
 ```javascript runnable editable
 // 音を出す
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 var oscNode = audioCtx.createOscillator();
 oscNode.connect( audioCtx.destination );
@@ -43,6 +44,7 @@ WebAudioAPIを使用して音を鳴らすためには，まずAudioContextを作
 
 ```javascript once editable console
 // WebAudioの初期化
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 
 console.log( audioCtx );
@@ -117,6 +119,7 @@ WebAudioAPIでは，音に様々な加工を施すことができます．まず
 
 ```javascript runnable editable
 // Max音量：1秒間，1/2音量：1秒間
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 var oscNode = audioCtx.createOscillator();
 var gainNode = audioCtx.createGain();
@@ -140,6 +143,7 @@ oscNode.stop();
 
 ```javascript runnable editable
 // コンテクスト，オシレータノード，ゲインノードの初期化
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 var oscNode = audioCtx.createOscillator();
 var gainNode = audioCtx.createGain();
