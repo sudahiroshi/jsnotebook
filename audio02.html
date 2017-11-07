@@ -2,7 +2,6 @@
 <html lang='ja'>
 <head>
     <meta charset='utf-8'>
-    <link rel="stylesheet" href="./css/styles/default.css">
     <link rel="stylesheet" href="./css/jsnotebook.css">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
@@ -49,8 +48,9 @@ osc3.stop();
 ```
 
 それではプログラムを分割していきます．
-
+</jsn-md>
 <div class="group01">
+<jsn-md>
 まずはコンテクスト，オシレータノード3個を初期化します．
 
 ```javascript runnable editable
@@ -98,9 +98,9 @@ osc1.stop();
 osc2.stop();
 osc3.stop();
 ```
-
+</jsn-md>
 </div>
-
+<jsn-md>
 ## 矩形波を合成する
 
 オシレータノードをゲインノードに接続して音量を調整することも可能です．また，各オシレータノードを別々のゲインノードに接続すれば，周波数ごとの音量を調整可能です．つまり，矩形波や三角波を合成することも簡単に行なえます．
@@ -142,8 +142,9 @@ for( var i=0; i< number; i++ ) {
 ```
 
 それでは分割してみていきます．
+</jsn-md>
 <div class="group01">
-
+<jsn-md>
 まずはコンテクストとオシレータノード，ゲインノードの初期化です．続けて，オシレータノード→ゲインノード→出力先の接続を行います．
 
 20個分の周波数を合成するため，配列を使用しています．JavaScriptでは，配列の宣言にnew Array( 要素数)を使用します．
@@ -187,8 +188,9 @@ for( var i=0; i< number; i++ ) { osc[i].start(); }
 ```javascritp runnable editable
 for( var i=0; i< number; i++ ) { osc[i].stop(); }   
 ```
+</jsn-md>
 </div>
-
+<jsn-md>
 ## 楽器音を合成する
 
 楽器音を構成するスペクトルは一般的に複雑ですが，おおよその音色で良ければ単純なスペクトルで表すことが可能です．ここでは，以下の4つの楽器音（に近い音）を合成してみましょう．
@@ -207,8 +209,9 @@ var audioCtx = new AudioContext();
 ```
 
 次に，合成音を作成します．下の枠内は，上から順に実行してください．何度も実行して音の違いを確認してください．
+</jsn-md>
 <div class = "group01">
-
+<jsn-md>
 基準となる音を合成します．
 
 ```javascript runnable editable
@@ -230,8 +233,9 @@ amp[i].connect( audioCtx.destination );
 下の枠内は，どれか1つだけ実行してください．for文のパラメータを変更することでそれぞれの楽器に必要な周波数のみを残しています．
 
 または1つも実行しなければバイオリンの音になります．
-
+</jsn-md>
 <div class = "group02">
+<jsn-md>
 ```javascript runnable editable
 // 偶数成分をカット：クラリネットのような音色
 for( var i=2; i< number; i+=2 ) {
@@ -252,9 +256,9 @@ for( var i=6; i< number; i++ ) {
   amp[i].gain.value = 0;
 }
 ```
-
+</jsn-md>
 </div>
-
+<jsn-md>
 音を鳴らします．
 ```javascript runnable editable
 for( var i=1; i< number; i++ ) { osc[i].start(); } 
@@ -264,10 +268,9 @@ for( var i=1; i< number; i++ ) { osc[i].start(); }
 ```javascript runnable editable
 for( var i=1; i< number; i++ ) { osc[i].stop(); } 
 ```
-
+</jsn-md>
 </div>
 
-</jsn-md>
 </article>
 </body>
 

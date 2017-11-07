@@ -2,9 +2,7 @@
 <html lang='ja'>
 <head>
     <meta charset='utf-8'>
-    <link rel="stylesheet" href="./css/styles/default.css">
     <link rel="stylesheet" href="./css/jsnotebook.css">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
     <script src="./js/jsnotebook.js"></script>
@@ -40,7 +38,9 @@ setTimeout( function(){ oscNode.stop() }, 1000 );
 
 WebAudioAPIを使用して音を鳴らすためには，まずAudioContextを作成します．コンテキストとは，元々**文脈**という意味を持っていますが，プログラム用語では**状況によって異なる動作を行うもの**が転じて**制御するための情報**という意味を持ちます．
 
-念のため，作成されたコンテキストを表示しています．
+このAudioContextですが，Webブラウザによって名称が若干異なります．元々はWebブラウザごとに暫定的な仕様に基いて実装されていた際の名残で，将来的に統一されると思われます．現在では，通常のWebブラウザでは「AudioContext」が用いられ，iOSでは「webkitAudioContext」が用いられています．その違いを吸収するコードが1行目で，どちらか実装されている方をAudioContextとする方法です．また，windowという単語は，グローバル変数を表します．
+
+以下を実行すると，作成されたコンテキストを表示しています．
 
 ```javascript once editable console
 // WebAudioの初期化
