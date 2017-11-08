@@ -15,14 +15,20 @@
 
 ## はじめに
 
-アナログシンセサイザーやFM音源の仕組みを簡単に説明し，実際に音を合成します．
+アナログシンセサイザーやFM音源の仕組みを簡単に説明し，実際に音を合成します．まずは以下のプログラムを実行して，AudioContextの初期化を行ってから，以降のプログラムを実行してください．
 
-## アナライザーノードの使い方
-
-```javascript runnable editable
-// オシレータを2つ作ってビブラートを再現する
+```javascript once editable
+// はじめに1回だけ実行してください
 window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
+```
+
+## ビブラートを作る
+
+オシレータノードの出力を，別のオシレータノードの周波数として入力することが可能です．この機能を使い，1つ目のオシレータから数Hzの周波数を発生させることで，ビブラートを作ることが可能です．以下のコードを実行してください．
+
+```javascript sandbox editable
+// オシレータを2つ作ってビブラートを再現する
 
 // LFO関係
 var lfo = audioCtx.createOscillator();
@@ -56,22 +62,26 @@ vco1.stop();
 }, 3000 );
 ```
 
-```javascript runnable editable
-// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
-window.AudioContext = window.webkitAudioContext || window.AudioContext;
-var audioCtx = new AudioContext();
+## FM音源の元を再現
 
-// LFO関係
+FM音源とは，ビブラートを作るための1つ目のオシレータの周波数を，誤って高い周波数にしたことから生まれたと言われ，80〜90年台のパソコンやシンセサイザー，2000年前後の携帯電話でおなじみの方式です．
+
+FM音源では，通常2〜4個のオシレータ（FM音源の世界ではオペレータと呼ばれる）を接続して音を作ります．ここでは2つのオペレータを直列に繋いで音を作ります．
+
+```javascript sandbox editable
+// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
+
+// LFO関係（注：Modulatorと呼ばれている）
 var lfo = audioCtx.createOscillator();
-lfo.frequency.value = 220;
+lfo.frequency.value = 1320;
 
 var gainLfo = audioCtx.createGain();
-gainLfo.gain.value = 300;
+gainLfo.gain.value = 1500;
 
-// VCO1関係
+// VCO1関係（注：Carrierと呼ばれている）
 var vco1 = audioCtx.createOscillator();
 vco1.frequency.value = 440;
-vco1.type="sawtooth";
+vco1.type="sine";
 
 var gainVco1 = audioCtx.createGain();
 gainVco1.gain.value = 0.9;
@@ -85,6 +95,114 @@ gainVco1.connect( audioCtx.destination );
 // 音を出す
 lfo.start();
 vco1.start();
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+}, 3000 );
+```
+
+## Feedbackを持つFM音源
+
+```javascript sandbox editable
+// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
+
+// LFO関係（注：FM音源ではModulatorと呼ばれている）
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 440*2;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 800;
+
+// Feedback関係
+var gainFb = audioCtx.createGain();
+gainFb.gain.value = 200;
+
+// VCO1関係（注：FM音源ではCarrierと呼ばれている）
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 440;
+vco1.type="sine";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.9;
+
+// 接続
+lfo.connect( gainLfo );
+lfo.connect( gainFb );
+gainFb.connect( lfo.frequency );
+gainLfo.connect( vco1.frequency );
+vco1.connect( gainVco1 );
+gainVco1.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+}, 3000 );
+```
+
+## エンベロープを付ける
+
+シンセサイザーの仕組みを模すことで様々な音を作ることができますが，実際の楽器音は鳴り始めから鳴り終わるまでに音量が刻々と変化します．この音量の変化を作る仕組みがVCAやエンベロープと呼ばれています．
+
+次のプログラムで説明します．
+
+```javascirpt sandbox editable
+// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
+
+// LFO関係（注：FM音源ではModulatorと呼ばれている）
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 223;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 0.8;
+
+// Feedback関係
+var gainFb = audioCtx.createGain();
+gainFb.gain.value = 200;
+
+// VCO1関係（注：FM音源ではCarrierと呼ばれている）
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 220;
+vco1.type="sine";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.8;
+
+var gainVcf = audioCtx.createGain();
+gainVcf.gain.value = 1;
+
+// 接続
+lfo.connect( gainLfo );
+lfo.connect( gainFb );
+gainFb.connect( lfo.frequency );
+gainLfo.connect( gainVcf );
+vco1.connect( gainVco1 );
+gainVco1.connect( gainVcf );
+gainVcf.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// エンベロープ設定
+var now = audioCtx.currentTime;
+var volume = 1;
+var attack = 0.0 // attackに要する時間 [sec]
+var decay = 0.2; // decayする時間 [sec]
+var sustain = 0.8; // sustainレベル
+var release = 0.5; // キーオフしてからの時間 [sec]
+
+gainVcf.gain.cancelScheduledValues( 0 );
+gainVcf.gain.setValueAtTime( 0.0, now );
+gainVcf.gain.linearRampToValueAtTime( volume, now + attack );
+gainVcf.gain.linearRampToValueAtTime( sustain * volume, now + attack + decay );
+gainVcf.gain.linearRampToValueAtTime( 0.0, now + attack + decay + release );
 
 // 音を止める
 setTimeout( function(){

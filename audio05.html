@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+    <meta charset='utf-8'>
+    <link rel="stylesheet" href="./css/jsnotebook.css">
+    <link rel="stylesheet" href="./css/styles/xcode.css">
+    <script src="./js/showdown.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    <script src="./js/jsnotebook.js"></script>
+<body>
+<article>
+<jsn-md>
+音を加工する
+===============
+
+## はじめに
+
+アナログシンセサイザーやFM音源の仕組みを簡単に説明し，実際に音を合成します．まずは以下のプログラムを実行して，AudioContextの初期化を行ってから，以降のプログラムを実行してください．
+
+```javascript once editable
+// はじめに1回だけ実行してください
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
+var audioCtx = new AudioContext();
+```
+
+## エンベロープを付ける
+
+シンセサイザーの仕組みを模すことで様々な音を作ることができますが，実際の楽器音は鳴り始めから鳴り終わるまでに音量が刻々と変化します．この音量の変化を作る仕組みがVCAやエンベロープと呼ばれています．
+
+次のプログラムで説明します．
+
+```javascirpt sandbox editable
+// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
+
+// LFO関係（注：FM音源ではModulatorと呼ばれている）
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 223;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 0.8;
+
+// Feedback関係
+var gainFb = audioCtx.createGain();
+gainFb.gain.value = 200;
+
+// VCO1関係（注：FM音源ではCarrierと呼ばれている）
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 220;
+vco1.type="sine";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.8;
+
+// エンベロープ関連
+var gainVcf = audioCtx.createGain();
+gainVcf.gain.value = 1;
+
+// バッファ作成
+var arr = audioCtx.createBuffer( 2, audioCtx.sampleRate * 1.0, audioCtx.sampleRate );
+var chanL = arr.getChannelData( 0 );
+var chanR = arr.getChannelData( 1 );
+chanL[0] = chanR[0] = 1.0;
+chanL[44100/4+44100/8] = chanR[44100/4+44100/8] = 0.8;
+chanL[44100/2] = chanR[44100/2] = 0.6;
+
+console.log( arr );
+// 畳み込み関連
+var convNode = audioCtx.createConvolver();
+convNode.buffer = arr
+
+
+// 接続
+lfo.connect( gainLfo );
+lfo.connect( gainFb );
+gainFb.connect( lfo.frequency );
+gainLfo.connect( gainVcf );
+vco1.connect( gainVco1 );
+gainVco1.connect( gainVcf );
+gainVcf.connect( convNode );
+convNode.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// エンベロープ設定
+var now = audioCtx.currentTime;
+var volume = 1;
+var attack = 0.0 // attackに要する時間 [sec]
+var decay = 0.2; // decayする時間 [sec]
+var sustain = 0.8; // sustainレベル
+var release = 0.5; // キーオフしてからの時間 [sec]
+
+gainVcf.gain.cancelScheduledValues( 0 );
+gainVcf.gain.setValueAtTime( 0.0, now );
+gainVcf.gain.linearRampToValueAtTime( volume, now + attack );
+gainVcf.gain.linearRampToValueAtTime( sustain * volume, now + attack + decay );
+gainVcf.gain.linearRampToValueAtTime( 0.0, now + attack + decay + release );
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+}, 3000 );
+```
+
+</jsn-md>
+</div>
+
+</article>
+</body>
+
+</html>
