@@ -3,6 +3,7 @@
 <head>
     <meta charset='utf-8'>
     <link rel="stylesheet" href="./css/jsnotebook.css">
+    <link rel="stylesheet" href="./css/styles/xcode.css">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
     <script src="./js/jsnotebook.js"></script>
@@ -37,6 +38,43 @@ vco1.type="sawtooth";
 
 var gainVco1 = audioCtx.createGain();
 gainVco1.gain.value = 0.3;
+
+// 接続
+lfo.connect( gainLfo );
+gainLfo.connect( vco1.frequency );
+vco1.connect( gainVco1 );
+gainVco1.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+}, 3000 );
+```
+
+```javascript runnable editable
+// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
+var audioCtx = new AudioContext();
+
+// LFO関係
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 220;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 300;
+
+// VCO1関係
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 440;
+vco1.type="sawtooth";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.9;
 
 // 接続
 lfo.connect( gainLfo );
@@ -239,6 +277,77 @@ setTimeout( function(){
 lfo.stop();
 vco1.stop();
 vco2.stop();
+}, 3000 );
+```
+
+```javascript runnable editable
+//  FM音源のような音
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
+var audioCtx = new AudioContext();
+
+// Modulator（これまでで言うLFO）関係
+var modulator = audioCtx.createOscillator();
+modulator.frequency.value = 1500;
+modulator.type = "sine";
+
+var modulatorGain = audioCtx.createGain();
+modulatorGain.gain.value = 250;
+
+var feedbackGain = audioCtx.createGain();
+feedbackGain.gain.value = 250;
+
+// Carrier（これまでで言うVCO1）関係
+var carrier = audioCtx.createOscillator();
+carrier.frequency.value = 440;
+carrier.type="sine";
+
+var carrierGain = audioCtx.createGain();
+carrierGain.gain.value = 0.99;
+
+// 接続
+modulator.connect( modulatorGain );
+modulatorGain.connect( carrier.frequency );
+//modulatorGain.connect( audioCtx.destination );
+carrier.connect( carrierGain );
+carrierGain.connect( audioCtx.destination );
+modulator.connect( feedbackGain );
+feedbackGain.connect( modulator.frequency );
+
+// 音を出す
+modulator.start();
+carrier.start();
+
+// エンベロープ設定
+var now = audioCtx.currentTime;
+var volume = 1;
+var mattack = 0 // attackに要する時間 [sec]
+var mdecay = 0.5; // decayする時間 [sec]
+var msustain = 0.5; // sustainレベル
+var mkeep = 0.5;
+var mrelease = 0.5; // キーオフしてからの時間 [sec]
+
+modulatorGain.gain.cancelScheduledValues( 0 );
+modulatorGain.gain.setValueAtTime( 0.0, now );
+modulatorGain.gain.linearRampToValueAtTime( volume, now + mattack );
+modulatorGain.gain.linearRampToValueAtTime( msustain * volume, now + mattack + mdecay );
+modulatorGain.gain.linearRampToValueAtTime( 0.0, now + mattack + mdecay + mkeep + mrelease );
+
+var cattack = 0 // attackに要する時間 [sec]
+var cdecay = 0.3; // decayする時間 [sec]
+var csustain = 0.3; // sustainレベル
+var ckeep = 0.5;
+var crelease = 0.4; // キーオフしてからの時間 [sec]
+
+carrierGain.gain.cancelScheduledValues( 0 );
+carrierGain.gain.setValueAtTime( 0.0, now );
+carrierGain.gain.linearRampToValueAtTime( volume, now + cattack );
+carrierGain.gain.linearRampToValueAtTime( csustain * volume, now + cattack + cdecay );
+carrierGain.gain.linearRampToValueAtTime( 0.0, now + cattack + cdecay + ckeep + crelease );
+
+// 音を止める
+setTimeout( function(){
+modulator.stop();
+carrier.stop();
 }, 3000 );
 ```
 
