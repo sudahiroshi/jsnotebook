@@ -2,6 +2,7 @@
 <html lang='ja'>
 <head>
     <meta charset='utf-8'>
+    <title>畳み込み演算</title>
     <link rel="stylesheet" href="./css/jsnotebook.css">
     <link rel="stylesheet" href="./css/styles/xcode.css">
     <script src="./js/showdown.min.js"></script>
@@ -10,12 +11,12 @@
 <body>
 <article>
 <jsn-md>
-音を加工する
+畳み込み演算
 ===============
 
 ## はじめに
 
-アナログシンセサイザーやFM音源の仕組みを簡単に説明し，実際に音を合成します．まずは以下のプログラムを実行して，AudioContextの初期化を行ってから，以降のプログラムを実行してください．
+WebAudioAPIは，標準で畳み込み演算の機能を持っており，コンボルバーノードと呼ばれています．インパルス応答は，外部ファイルを読み込むことも，プログラム中で配列に数値を入れることでも実現できます．このページのプログラムでは，配列に数値を入れています．まずは以下を実行してください．
 
 ```javascript once editable
 // はじめに1回だけ実行してください
@@ -23,14 +24,10 @@ window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 ```
 
-## エンベロープを付ける
+その後，以下の枠を順に実行してください．なお，何回でも実行可能です．
 
-シンセサイザーの仕組みを模すことで様々な音を作ることができますが，実際の楽器音は鳴り始めから鳴り終わるまでに音量が刻々と変化します．この音量の変化を作る仕組みがVCAやエンベロープと呼ばれています．
-
-次のプログラムで説明します．
-
-```javascirpt sandbox editable
-// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
+```javascirpt runnable editable
+// 畳み込み演算の例
 
 // LFO関係（注：FM音源ではModulatorと呼ばれている）
 var lfo = audioCtx.createOscillator();
@@ -54,15 +51,32 @@ gainVco1.gain.value = 0.8;
 // エンベロープ関連
 var gainVcf = audioCtx.createGain();
 gainVcf.gain.value = 1;
+```
 
+以下の部分が，インパルス応答を定義する部分です．左右のチャンネル（chanLとchanR）に分かれており，独立した数値を入れることも可能です．なお，```audioCtx.sampleRate```には，WebAudioAPIが内部的に使用するサンプリング周波数が入っています．
+
+プログラム中の```audioCtx.createBuffer```のパラメータは以下のとおりです．
+
+* チャンネル数
+* インパルス応答の要素数（サンプリング周波数☓秒数を与える）
+* サンプリング周波数
+
+その下にある配列への代入によって，インパルス応答を作成しています．代入できる値は-1〜+1です．タイミングや音量を調整することで，様々な空間を再現することが可能です．
+
+```javascirpt runnable editable
 // バッファ作成
 var arr = audioCtx.createBuffer( 2, audioCtx.sampleRate * 1.0, audioCtx.sampleRate );
 var chanL = arr.getChannelData( 0 );
 var chanR = arr.getChannelData( 1 );
+
 chanL[0] = chanR[0] = 1.0;
 chanL[44100/4+44100/8] = chanR[44100/4+44100/8] = 0.8;
 chanL[44100/2] = chanR[44100/2] = 0.6;
+```
 
+以下の部分で，実際に音を出しています．音はベースのような音です．
+
+```javascirpt runnable editable
 console.log( arr );
 // 畳み込み関連
 var convNode = audioCtx.createConvolver();
