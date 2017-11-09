@@ -18,6 +18,20 @@
 
 アナログシンセサイザーやFM音源の仕組みを簡単に説明し，実際に音を合成します．まずは以下のプログラムを実行して，AudioContextの初期化を行ってから，以降のプログラムを実行してください．
 
+このページで使われている単語の一覧を示します．
+
+単語 | フルスペル | 意味
+--|--
+オシレータ | Oscilator | 発振器
+オペレータ | Operator | 発振器のFM音源用語
+LFO | Low Frequency Oscilator | 低周波発振器
+VCO | Voltage Controlled Oscilator | 発振器のアナログシンセサイザー用語
+VCF | Voltage Controlled Filter | フィルター回路
+VCA | Voltage Controlled Amplifier | 音量調整回路
+EG | Envelope Generator | 振幅を時間変化させる回路
+キャリア | Carrier | FM音源における発振器
+モジュレータ | Modulator | キャリアの周波数を変化させる発振器
+
 ```javascript once editable
 // はじめに1回だけ実行してください
 window.AudioContext = window.webkitAudioContext || window.AudioContext;
