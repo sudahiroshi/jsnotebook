@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+    <meta charset='utf-8'>
+    <title>要素を取得する</title>
+    <link rel="stylesheet" href="./css/jsnotebook.css">
+    <link rel="stylesheet" href="./css/styles/xcode.css">
+    <script src="./js/showdown.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    <script src="./js/jsnotebook.js"></script>
+<body>
+<article>
+<jsn-md>
+要素を取得する
+===============
+
+## はじめに
+
+このページでは，要素の取得方法を学習します．要素とは，タグで囲まれた範囲で，これまでに```document.getElementById```で取得できることは説明してあります．ここでは，さらに細かい部分を学習していきます．
+
+まず，以下のようなタグが有ることを想定します．ここで，プログラムから取得したいのは```value```内の文字列となります．
+
+```html hl
+&lt;iput type="text" value="ここが枠内の文字列" id="input01"&gt;&lt;/input&gt;
+```
+
+<input type="text" value="ここが枠内の文字列" id="input01"></input>
+
+そのような場合は，以下のように書くことで```value```の内容を取得できます．
+
+```javascript sandbox editable console
+var value = document.getElementById( "input01" ).value;
+console.log( value );
+```
+
+また，```type```の内容を取得するにはどうすれば良いでしょうか？上のプログラムから予想できるとおり，プログラムは以下のように鳴ります．
+
+```javascript sandbox editable console
+var type = document.getElementById( "input01" ).type;
+console.log( type );
+```
+
+あまり```type```を取得する場面はないと思いますが，例えばアンケートフォームのように並んでいるラジオボタンやチェックボックスの内容を全て取得したいようなときに役に立ちます．
+
+
+## 要素を全て取得する
+
+それでは，連続して並んでいる```input```要素を全て取得したい場合はどうすれば良いでしょうか？幾つか手段があるので順に説明します．
+
+### getElementByTagNameを使用する場合
+
+例えば以下のようなHTMLが有ったとします．
+```html hl
+&lt;input type="radio" name="foo" value="1" class="input02" checked&gt;1番目の選択肢&lt;/input&gt;
+&lt;input type="radio" name="foo" value="2" class="input02"&gt;2番目の選択肢&lt;/input&gt;
+&lt;input type="radio" name="foo" value="3" class="input02"&gt;3番目の選択肢&lt;/input&gt;
+&lt;input type="radio" name="foo" value="4" class="input02"&gt;4番目の選択肢&lt;/input&gt;
+```
+
+<input type="radio" name="foo" value="1" class="input02" checked>1番目の選択肢</input>
+<input type="radio" name="foo" value="2" class="input02">2番目の選択肢</input>
+<input type="radio" name="foo" value="3" class="input02">3番目の選択肢</input>
+<input type="radio" name="foo" value="4" class="input02">4番目の選択肢</input>
+
+通常はformタグと併用して，自動的にチェックされている値がサーバに伝達されますが，クライアントサイドで選択されている箇所を調べたい場合，手作業で行うことになります．まずは以下のようにして要素群を取得します．
+
+```javascript runnable editable console
+var radios = document.getElementsByTagName( "input" );
+console.log( radios );
+```
+
+その後，以下のようにして一つ一つの内容を見ていきます．
+
+```javascirpt runnable editable console
+radios.forEach( function( elm ) {
+    if( elm.type == "radio" ) { 
+            console.log( elm.value );
+    }
+});
+```
+
+<img src="./img/audio04-01.png" width="80%" />
+
+これをプログラムで書くと以下のように鳴ります．
+
+```javascript sandbox editable
+// オシレータを2つ作ってビブラートを再現する
+
+// LFO関係
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 2;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 1;
+
+// VCO1関係
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 440;
+vco1.type="sawtooth";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.3;
+
+// 接続
+lfo.connect( gainLfo );
+gainLfo.connect( vco1.frequency );
+vco1.connect( gainVco1 );
+gainVco1.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+}, 3000 );
+```
+
+## FM音源の元を再現
+
+FM音源とは，ビブラートを作るための1つ目のオシレータの周波数を，誤って高い周波数にしたことから生まれたと言われ，80〜90年台のパソコンやシンセサイザー，2000年前後の携帯電話でおなじみの方式です．
+
+FM音源では，通常2〜4個のオシレータ（FM音源の世界ではオペレータと呼ばれる）を接続して音を作ります．ここでは以下のように2つのオペレータを直列に繋ぎ，lfoの周波数を1320Hz，logのゲインを1500としています．これをvco1の周波数入力に繋いで音を作っています．
+
+<img src="./img/audio04-02.png" width="80%" />
+
+以下のプログラムを実行してみてください．その後，lfoの周波数やgainLfoのゲインを変更して実行してください．
+
+```javascript sandbox editable
+// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
+
+// LFO関係（注：Modulatorと呼ばれている）
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 1320;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 1500;
+
+// VCO1関係（注：Carrierと呼ばれている）
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 440;
+vco1.type="sine";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.9;
+
+// 接続
+lfo.connect( gainLfo );
+gainLfo.connect( vco1.frequency );
+vco1.connect( gainVco1 );
+gainVco1.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+}, 3000 );
+```
+
+## Feedbackを持つFM音源
+
+オペレータを2つ重ねることで，高周波数成分を持つ波形を合成できますが，別のやり方としてあるオペレータの出力を同オペレータの周波数入力につなげることで複雑な波形を作り出すことが可能です．以下のプログラムで行っています．
+
+実際には，以下の図のように，lfoで880Hzの周波数を作り，gainFeedbackを通じてlfoの周波数入力に接続しています．lfoの出力はgainLfoで増幅され，vco1の周波数入力に繋いでいます．
+
+<img src="./img/audio04-03.png" width="80%" />
+
+以下のプログラムを実行してみてください．その後，lfoの周波数やgainFeedbackとgainLfoのゲインを変更して実行してください．
+
+```javascript sandbox editable
+// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
+
+// LFO関係（注：FM音源ではModulatorと呼ばれている）
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 440*2;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 800;
+
+// Feedback関係
+var gainFb = audioCtx.createGain();
+gainFb.gain.value = 200;
+
+// VCO1関係（注：FM音源ではCarrierと呼ばれている）
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 440;
+vco1.type="sine";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.9;
+
+// 接続
+lfo.connect( gainLfo );
+lfo.connect( gainFb );
+gainFb.connect( lfo.frequency );
+gainLfo.connect( vco1.frequency );
+vco1.connect( gainVco1 );
+gainVco1.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+}, 3000 );
+```
+
+## エンベロープを付ける
+
+シンセサイザーの仕組みを模すことで様々な音を作ることができますが，実際の楽器音は鳴り始めから鳴り終わるまでに音量が刻々と変化します．この音量の変化を作る仕組みはVCAやエンベロープと呼ばれています．
+
+具体的には，以下の図のAttack，Decay，Releaseの時間とSustainレベルを定めています．
+<img src="./img/audio04-05.png" width="80%" />
+
+そのために，gainVcfを追加し，このゲインを時間変化させます．なお，さらに複雑な音をだすために各オペレータの出力にエンベロープを設定することがあります．
+
+<img src="./img/audio04-04.png" width="80%" />
+
+次のプログラムを実行してください．その後，音を鳴らしている下にある，gainVcfの各種パラメータを調整してみてください．
+
+```javascirpt sandbox editable
+// エンベロープの設定
+
+// LFO関係（注：FM音源ではModulatorと呼ばれている）
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 223;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 0.8;
+
+// Feedback関係
+var gainFb = audioCtx.createGain();
+gainFb.gain.value = 200;
+
+// VCO1関係（注：FM音源ではCarrierと呼ばれている）
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 220;
+vco1.type="sine";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.8;
+
+var gainVcf = audioCtx.createGain();
+gainVcf.gain.value = 1;
+
+// 接続
+lfo.connect( gainLfo );
+lfo.connect( gainFb );
+gainFb.connect( lfo.frequency );
+gainLfo.connect( gainVcf );
+vco1.connect( gainVco1 );
+gainVco1.connect( gainVcf );
+gainVcf.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// エンベロープ設定
+var now = audioCtx.currentTime;
+var volume = 1;
+var attack = 0.0 // attackに要する時間 [sec]
+var decay = 0.2; // decayする時間 [sec]
+var sustain = 0.8; // sustainレベル
+var release = 0.5; // キーオフしてからの時間 [sec]
+
+gainVcf.gain.cancelScheduledValues( 0 );
+gainVcf.gain.setValueAtTime( 0.0, now );
+gainVcf.gain.linearRampToValueAtTime( volume, now + attack );
+gainVcf.gain.linearRampToValueAtTime( sustain * volume, now + attack + decay );
+gainVcf.gain.linearRampToValueAtTime( 0.0, now + attack + decay + release );
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+}, 3000 );
+```
+
+## アナログシンセサイザーのオシレータ構成
+
+アナログシンセサイザーでは，複数のVCOを組み合わせ，片方の周波数を微妙にずらし（デチューンと呼ばれています）合成して複雑な波形を作り出していました．以下のプログラムでは，vco2の音を若干低くして，vco1の音と合成しています．
+
+オシレータの接続は以下の図のようになります．lfoの出力をvco1とvco2の周波数入力に繋いでいます．
+
+<img src="./img/audio04-06.png" width="80%">
+
+プログラム中では，```vco2.detune.value = -30```としています．この値の単位は「セント」と呼ばれ，100になると半音上がります．
+
+```javascript sandbox editable
+// アナログシンセイサイザー的な音作り：オシレータを3つ作ってビブラートを再現する
+
+// LFO関係
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 2;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 1;
+
+// VCO1関係
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 440;
+vco1.type="sawtooth";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.3;
+
+// VCO2関係
+var vco2 = audioCtx.createOscillator();
+vco2.frequency.value = 440;
+vco2.type="sawtooth";
+vco2.detune.value = -30;
+
+var gainVco2 = audioCtx.createGain();
+gainVco2.gain.value = 0.3;
+
+// 接続
+lfo.connect( gainLfo );
+gainLfo.connect( vco1.frequency );
+gainLfo.connect( vco2.frequency );
+vco1.connect( gainVco1 );
+vco2.connect( gainVco2 );
+gainVco1.connect( audioCtx.destination );
+gainVco2.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+vco2.start();
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+vco2.stop();
+}, 3000 );
+```
+
+## Lowpassフィルタ
+
+WebAudioAPIでは，ローパスフィルタやハイパスフィルタ，バンドパスフィルタなどを使用できます．これらはまとめて```BiquadFilterNode```と呼ばれています．
+
+オシレータの接続は以下のとおりです．vcfに```BiquadFilterNode```によるローパスフィルターを設定し，高周波数成分をカットします．
+
+<img src="./img/audio04-07.png" width="80%">
+
+以下のプログラムは，10kHz以下の音を通すように設定しています．
+
+```javascript sandbox editable
+// Lowpassフィルターを使う
+
+// LFO関係
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 2;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 1;
+
+// VCO1関係
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 440;
+vco1.type="sawtooth";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.3;
+
+// VCO2関係
+var vco2 = audioCtx.createOscillator();
+vco2.frequency.value = 440;
+vco2.type="sawtooth";
+vco2.detune.value = -10;
+
+var gainVco2 = audioCtx.createGain();
+gainVco2.gain.value = 0.3;
+
+// VCF関係
+var vcf = audioCtx.createBiquadFilter();
+vcf.frequency.value = 10000;
+
+var gainVcf = audioCtx.createGain();
+gainVcf.gain.value = 0.5;
+
+// 接続
+lfo.connect( gainLfo );
+gainLfo.connect( vco1.frequency );
+gainLfo.connect( vco2.frequency );
+gainLfo.connect( vco2.detune );
+vco1.connect( gainVco1 );
+vco2.connect( gainVco2 );
+gainVco1.connect( vcf );
+gainVco2.connect( vcf );
+vcf.connect( gainVcf );
+gainVcf.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+vco2.start();
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+vco2.stop();
+}, 3000 );
+```
+
+## エンベロープを付ける
+
+アナログシンセイサイザーのような構成にしても，エンベロープを付けることができます．オシレータの構成は1つ上と同じです．ここでgainVcfにエンベロープの設定を行っています．
+
+<img src="./img/audio04-07.png" width="80%">
+
+```javascript sandbox editable
+// エンベロープを付ける
+
+// LFO関係
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 2;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 1;
+
+// VCO1関係
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 440;
+vco1.type="sawtooth";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.3;
+
+// VCO2関係
+var vco2 = audioCtx.createOscillator();
+vco2.frequency.value = 440;
+vco2.type="sawtooth";
+vco2.detune.value = -10;
+
+var gainVco2 = audioCtx.createGain();
+gainVco2.gain.value = 0.3;
+
+// VCF関係
+var vcf = audioCtx.createBiquadFilter();
+vcf.frequency.value = 10000;
+
+var gainVcf = audioCtx.createGain();
+var volume = 0.5;
+gainVcf.gain.value = volume;
+
+// 接続
+lfo.connect( gainLfo );
+gainLfo.connect( vco1.frequency );
+gainLfo.connect( vco2.frequency );
+gainLfo.connect( vco2.detune );
+vco1.connect( gainVco1 );
+vco2.connect( gainVco2 );
+gainVco1.connect( vcf );
+gainVco2.connect( vcf );
+vcf.connect( gainVcf );
+gainVcf.connect( audioCtx.destination );
+
+// 音を出す
+lfo.start();
+vco1.start();
+vco2.start();
+
+// エンベロープ設定
+var now = audioCtx.currentTime;
+var attack = 0.1 // attackに要する時間 [sec]
+var decay = 0.3; // decayする時間 [sec]
+var sustain = 0.2; // sustainレベル
+var release = 0.5; // キーオフしてからの時間 [sec]
+
+gainVcf.gain.cancelScheduledValues( 0 );
+gainVcf.gain.setValueAtTime( 0.0, now );
+gainVcf.gain.linearRampToValueAtTime( volume, now + attack );
+gainVcf.gain.linearRampToValueAtTime( sustain * volume, now + attack + decay );
+gainVcf.gain.linearRampToValueAtTime( 0.0, now + attack + decay + release );
+
+// 音を止める
+setTimeout( function(){
+lfo.stop();
+vco1.stop();
+vco2.stop();
+}, 3000 );
+```
+
+</jsn-md>
+</div>
+
+</article>
+</body>
+
+</html>
