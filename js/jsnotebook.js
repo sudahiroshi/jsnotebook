@@ -85,7 +85,7 @@ var setSandbox = ( div, element ) => {
         var dummyEval = eval;
         var script = "(function(){" + program
                 .replace( /<br>/g, "\r\n" )
-                .replace( /&nbsp;/," ")
+                .replace( /&nbsp;/g," ")
                 .replace( /console.log\(/g, "jnsPrint( output," )
             + "})()";;
         try {
@@ -118,8 +118,9 @@ window.addEventListener('load', function() {
     // &, >, <を置き換える
     var pres = document.querySelectorAll( 'pre code.javascript' );
     pres.forEach( function( value ) {
-        let code = value.innerHTML.replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>' );
+        let code = value.textContent.replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>' ).replace( / /g, '&nbsp;' );
         value.innerHTML = code;
+        console.log( value.innerHTML );
     });
 
     // runnableクラスの付いた要素に実行ボタンを付ける
@@ -189,7 +190,7 @@ window.addEventListener('load', function() {
     // hlクラスの付いた要素にSyntaxHighliteを行う
     var code = document.querySelectorAll( 'pre code.hl, pre code.html' );
     code.forEach( function( block ) {
-        block.innerHTML = block.innerHTML.replace( /&amp;/g, '&' );
+        block.innerHTML = block.innerHTML.replace( /&amp;/g, '&' ).replace( / /g, '&nbsp;' );
         hljs.highlightBlock( block );
     });
 });

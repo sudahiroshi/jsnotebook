@@ -114,8 +114,8 @@ beginPath〜strokeまでの間に，多数の描画メソッドを入れるこ�
 // 多数の直線の描画（上にある「canvas要素の取得」を実行してから，ここを実行してください）
 context.beginPath();
 for( var i=0; i<400; i+=4 ) {
-context.moveTo( i, 0 );
-context.lineTo( 400-i, 400 );
+  context.moveTo( i, 0 );
+  context.lineTo( 400-i, 400 );
 }
 context.stroke();
 ```
