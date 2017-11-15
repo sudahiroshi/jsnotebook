@@ -120,7 +120,6 @@ window.addEventListener('load', function() {
     pres.forEach( function( value ) {
         let code = value.textContent.replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>' ).replace( / /g, '&nbsp;' );
         value.innerHTML = code;
-        console.log( value.innerHTML );
     });
 
     // runnableクラスの付いた要素に実行ボタンを付ける

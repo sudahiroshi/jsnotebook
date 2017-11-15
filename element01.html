@@ -16,9 +16,9 @@
 
 ## はじめに
 
-このページでは，要素の取得方法を学習します．要素とは，タグで囲まれた範囲で，これまでに```document.getElementById```で取得できることは説明してあります．ここでは，さらに細かい部分を学習していきます．
+このページでは，要素（タグで囲まれた範囲）の取得方法を学習します．
 
-まず，以下のようなタグが有ることを想定します．ここで，プログラムから取得したいのは```value```内の文字列となります．
+まず，以下のようなタグが有ることを想定します．ここで，枠内の文字列＝```value```内の文字列を取得したいとします．
 
 ```html hl
 &lt;iput type="text" value="ここが枠内の文字列" id="input01"&gt;&lt;/input&gt;
@@ -26,14 +26,14 @@
 
 <input type="text" value="ここが枠内の文字列" id="input01"></input>
 
-そのような場合は，以下のように書くことで```value```の内容を取得できます．
+そのような場合は，```getElementById```関数を使用して要素を取得し，要素内の```value```の内容を取得するという手順で実行します．
 
 ```javascript sandbox editable console
 var value = document.getElementById( "input01" ).value;
 console.log( value );
 ```
 
-また，```type```の内容を取得するにはどうすれば良いでしょうか？上のプログラムから予想できるとおり，プログラムは以下のように鳴ります．
+同様に```type```の内容を取得するにはどうすれば良いでしょうか？上のプログラムから予想できるとおり，プログラムは以下のようになります．
 
 ```javascript sandbox editable console
 var type = document.getElementById( "input01" ).type;
@@ -41,6 +41,19 @@ console.log( type );
 ```
 
 あまり```type```を取得する場面はないと思いますが，例えばアンケートフォームのように並んでいるラジオボタンやチェックボックスの内容を全て取得したいようなときに役に立ちます．
+
+## 要素または要素群を取得する
+
+以下に，要素または要素群を取得する関数一覧を示します．使用例は次節以降で説明します．
+
+関数名 | 複数 | 意味
+--|--|--
+getElementById | | id属性を指定して要素を取得
+getElementsByName | ○ | name属性を指定して要素を取得
+getElementsByClassName | ○ | クラス名を指定して要素を取得
+getElementsByTagName | ○ | タグ名を指定して要素を取得
+querySelector | | CSSセレクタを指定して要素を取得
+querySelectorAll | ○ | CSSセレクタを指定して要素を取得
 
 
 ## 要素を全て取得する
@@ -65,19 +78,45 @@ console.log( type );
 通常はformタグと併用して，自動的にチェックされている値がサーバに伝達されますが，クライアントサイドで選択されている箇所を調べたい場合，手作業で行うことになります．まずは以下のようにして要素群を取得します．
 
 ```javascript runnable editable console
-var radios = document.getElementsByTagName( "input" );
+// inputタグの要素を全て取得します
+
+var inputElm = document.getElementsByTagName( "input" );
+console.log( inputElm );
+```
+
+その後，以下のようにして一つ一つの内容を見て，```type=="radio"```の項目を抽出します．ちょっと面倒ですね．
+
+```javascirpt runnable editable console
+// inputElmの中からtypeがradioのものを抽出します
+var radios = [];
+for( var elm of inputElm ) {
+  if( elm.type == "radio" ) { 
+    radios.push( elm );
+  }
+};
 console.log( radios );
 ```
 
-その後，以下のようにして一つ一つの内容を見ていきます．
+### querySelectorを使用する場合
 
-```javascirpt runnable editable console
-radios.forEach( function( elm ) {
-    if( elm.type == "radio" ) { 
-            console.log( elm.value );
-    }
-});
+昔ながらのgetElement(s)関係の関数はシンプルで良いのですが，融通がきかないのが欠点でした．そこで，CSSセレクタにマッチする単独の要素を得るquerySelectorと，全要素を得るquerySelectorAllが実装されました．サンプルを以下に示します．
+
+```javarscript runnable editable console
+// inputタグでtypeがradioのものを抽出します
+var radios2 = document.querySelectorAll( 'input[type="radio"]' );
+console.log( radios2 );
 ```
+
+## 要素を一つだけ取得する
+
+チェックされた要素のみを抽出したい場合，以下のように書きます．
+
+```javarscript runnable editable console
+// チェックされた要素を抽出します
+var radios3 = document.querySelector( 'input[checked]' );
+console.log( radios3 );
+```
+
 
 <img src="./img/audio04-01.png" width="80%" />
 
