@@ -62,477 +62,209 @@ querySelectorAll | ○ | CSSセレクタを指定して要素を取得
 
 それでは，連続して並んでいる```input```要素を全て取得したい場合はどうすれば良いでしょうか？幾つか手段があるので順に説明します．
 
-### getElementByTagNameを使用する場合
+例えば以下のようなIDが```input02-form```のform内に4つのラジオボタンが有る場合を考えます．ラジオボタンは上から順にvalueが1〜4で，class名が```input02```，nameが```radio02```であるものとします．
 
-例えば以下のようなHTMLが有ったとします．
 ```html hl
-&lt;input type="radio" name="foo" value="1" class="input02" checked&gt;1番目の選択肢&lt;/input&gt;
-&lt;input type="radio" name="foo" value="2" class="input02"&gt;2番目の選択肢&lt;/input&gt;
-&lt;input type="radio" name="foo" value="3" class="input02"&gt;3番目の選択肢&lt;/input&gt;
-&lt;input type="radio" name="foo" value="4" class="input02"&gt;4番目の選択肢&lt;/input&gt;
+&lt;form id="input02-form"&gt;
+&lt;input type="radio" value="1" class="input02" name="radio02" checked&gt;1番目の選択肢
+&lt;input type="radio" value="2" class="input02" name="radio02"&gt;2番目の選択肢
+&lt;input type="radio" value="3" class="input02" name="radio02"&gt;3番目の選択肢
+&lt;input type="radio" value="4" class="input02" name="radio02"&gt;4番目の選択肢
+&lt;/form&gt;
 ```
 
-<input type="radio" name="foo" value="1" class="input02" checked>1番目の選択肢</input>
-<input type="radio" name="foo" value="2" class="input02">2番目の選択肢</input>
-<input type="radio" name="foo" value="3" class="input02">3番目の選択肢</input>
-<input type="radio" name="foo" value="4" class="input02">4番目の選択肢</input>
+実際のラジオボタンは以下のようになります．
 
-通常はformタグと併用して，自動的にチェックされている値がサーバに伝達されますが，クライアントサイドで選択されている箇所を調べたい場合，手作業で行うことになります．まずは以下のようにして要素群を取得します．
+<form id="input02-form">
+<input type="radio" value="1" class="input02"  name="radio02" checked>1番目の選択肢
+<input type="radio" value="2" class="input02" name="radio02">2番目の選択肢
+<input type="radio" value="3" class="input02" name="radio02">3番目の選択肢
+<input type="radio" value="4" class="input02" name="radio02">4番目の選択肢
+</form>
+
+ここで，ラジオボタン群を抽出してみたいと思います．
+
+### getElementByTagNameを使用する場合
+</jsn-md>
+<div class="group01">
+<jsn-md>
+
+幾つかのやり方がありますが，ここではinputタグを抽出したいと思います．
 
 ```javascript runnable editable console
 // inputタグの要素を全て取得します
 
 var inputElm = document.getElementsByTagName( "input" );
-console.log( inputElm );
+console.log( inputElm.length + "個の要素を取得しました" );
 ```
 
-その後，以下のようにして一つ一つの内容を見て，```type=="radio"```の項目を抽出します．ちょっと面倒ですね．
+しかし，ページ内に存在する他のinputタグも一緒に抽出されてしまっています．そこで，以下のようにして一つ一つの内容を見て，```type=="radio"```の項目を抽出します．ちょっと面倒ですね．
 
 ```javascirpt runnable editable console
 // inputElmの中からtypeがradioのものを抽出します
-var radios = [];
+
+var radios0 = [];
 for( var elm of inputElm ) {
   if( elm.type == "radio" ) { 
-    radios.push( elm );
+    radios0.push( elm );
   }
 };
-console.log( radios );
+console.log( radios0.length + "個の要素を取得しました"  );
+console.log( "最初の要素のvalueは" + radios0[0].value + "です" );
+```
+</jsn-md>
+</div>
+
+<jsn-md>
+
+### getElementsByNameを使用する場合
+
+通常，inputタグのnameの内容は他の箇所と別の名称にします．そこで，この情報を使用して要素群を取得する事もできます．
+
+```javascirpt runnable editable console
+// nameがinput02の要素を全て取得します
+
+var radios1 = document.getElementsByName( 'radio02' );
+console.log( radios1.length + "個の要素を取得しました"  );
+console.log( "最初の要素のvalueは" + radios1[0].value + "です" );
 ```
 
 ### querySelectorを使用する場合
 
-昔ながらのgetElement(s)関係の関数はシンプルで良いのですが，融通がきかないのが欠点でした．そこで，CSSセレクタにマッチする単独の要素を得るquerySelectorと，全要素を得るquerySelectorAllが実装されました．サンプルを以下に示します．
+昔ながらのgetElement(s)関係の関数はシンプルで良いのですが，融通がきかないのが欠点でした．そこで，CSSセレクタにマッチする単独の要素を得る```querySelector```と，全要素を得る```querySelectorAll```が実装されました．
+
+querySelectorAllを使用したサンプルを以下に示します．パラメータはCSSセレクタなので，この場合はタグ名がinputで，さらに大カッコを使いtypeがraioの要素のみを抽出しています．
+
+なお，コメントアウトしている行は，タグ名がinputで，さらに大カッコを使いnameがradio02の要素のみを抽出しています．コメントの位置を変更して，どちらでも要素軍が取得できていることをご確認ください．
+
 
 ```javarscript runnable editable console
 // inputタグでtypeがradioのものを抽出します
+
 var radios2 = document.querySelectorAll( 'input[type="radio"]' );
-console.log( radios2 );
+// var radios2 = document.querySelectorAll( 'input[name="radio02"]' );
+console.log( radios2.length + "個の要素を取得しました" );
+console.log( "最初の要素のvalueは" + radios2[0].value + "です" );
 ```
 
-## 要素を一つだけ取得する
+## チェックされている要素を得る
 
-チェックされた要素のみを抽出したい場合，以下のように書きます．
+実際の使用例に近い形として，チェックされている要素を取得してみましょう．これには幾つかのやり方があり，ID付きのタグで囲まれている場合，```class```で指定する場合，```name```で指定する場合などに分けて考えてみたいと思います．
+
+### ID付きformで囲まれている場合（querySelector未使用）
+
+```javascirpt runnable editable console
+// IDからform要素を取得→input要素群を取得→checkedを探す
+// form内に外のinput要素が存在する場合はinput要素群を取得した後にtypeがradioの要素のみを抽出する必要あり
+
+var element = document.getElementById( 'input02-form' );
+var inputs = element.getElementsByTagName( 'input' );
+var target = undefined;
+for( var elm of inputs ) {
+  if( elm.checked == true ) {
+    target = elm;
+  }
+}
+console.log( target.value );
+```
+
+### ID付きformで囲まれている場合（querySelector使用）
+
+querySelectorを使用すると，以下のように書くことができます．今回はRadioボタン群から抽出したのでcheckedは1つしか存在しないという想定のものです．
 
 ```javarscript runnable editable console
-// チェックされた要素を抽出します
-var radios3 = document.querySelector( 'input[checked]' );
-console.log( radios3 );
+// idがinput02-formの要素を取得→inputタグtypeがradioでcheckedの付いている要素を抽出
+
+var inputform = document.getElementById('input02-form');
+var radios3 = inputform.querySelector( 'input[type="radio"]:checked' );
+console.log( radios3.value );
 ```
 
+### classで指定する場合（querySelector未使用）
 
-<img src="./img/audio04-01.png" width="80%" />
+```javascirpt runnable editable console
+// classがinput02の要素を取得→checkedを探す
 
-これをプログラムで書くと以下のように鳴ります．
-
-```javascript sandbox editable
-// オシレータを2つ作ってビブラートを再現する
-
-// LFO関係
-var lfo = audioCtx.createOscillator();
-lfo.frequency.value = 2;
-
-var gainLfo = audioCtx.createGain();
-gainLfo.gain.value = 1;
-
-// VCO1関係
-var vco1 = audioCtx.createOscillator();
-vco1.frequency.value = 440;
-vco1.type="sawtooth";
-
-var gainVco1 = audioCtx.createGain();
-gainVco1.gain.value = 0.3;
-
-// 接続
-lfo.connect( gainLfo );
-gainLfo.connect( vco1.frequency );
-vco1.connect( gainVco1 );
-gainVco1.connect( audioCtx.destination );
-
-// 音を出す
-lfo.start();
-vco1.start();
-
-// 音を止める
-setTimeout( function(){
-lfo.stop();
-vco1.stop();
-}, 3000 );
+var inputs = document.getElementsByClassName( 'input02' );
+var target = undefined;
+for( var elm of inputs ) {
+  if( elm.checked == true ) {
+    target = elm;
+  }
+}
+console.log( target.value );
 ```
 
-## FM音源の元を再現
+### classで指定する場合（querySelector使用）
 
-FM音源とは，ビブラートを作るための1つ目のオシレータの周波数を，誤って高い周波数にしたことから生まれたと言われ，80〜90年台のパソコンやシンセサイザー，2000年前後の携帯電話でおなじみの方式です．
+```javascirpt runnable editable console
+// classがinput02の要素の内checkedを抽出
 
-FM音源では，通常2〜4個のオシレータ（FM音源の世界ではオペレータと呼ばれる）を接続して音を作ります．ここでは以下のように2つのオペレータを直列に繋ぎ，lfoの周波数を1320Hz，logのゲインを1500としています．これをvco1の周波数入力に繋いで音を作っています．
-
-<img src="./img/audio04-02.png" width="80%" />
-
-以下のプログラムを実行してみてください．その後，lfoの周波数やgainLfoのゲインを変更して実行してください．
-
-```javascript sandbox editable
-// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
-
-// LFO関係（注：Modulatorと呼ばれている）
-var lfo = audioCtx.createOscillator();
-lfo.frequency.value = 1320;
-
-var gainLfo = audioCtx.createGain();
-gainLfo.gain.value = 1500;
-
-// VCO1関係（注：Carrierと呼ばれている）
-var vco1 = audioCtx.createOscillator();
-vco1.frequency.value = 440;
-vco1.type="sine";
-
-var gainVco1 = audioCtx.createGain();
-gainVco1.gain.value = 0.9;
-
-// 接続
-lfo.connect( gainLfo );
-gainLfo.connect( vco1.frequency );
-vco1.connect( gainVco1 );
-gainVco1.connect( audioCtx.destination );
-
-// 音を出す
-lfo.start();
-vco1.start();
-
-// 音を止める
-setTimeout( function(){
-lfo.stop();
-vco1.stop();
-}, 3000 );
+var target = document.querySelector( '.input02:checked' );
+console.log( target.value );
 ```
 
-## Feedbackを持つFM音源
+### nameで指定する場合（querySelector未使用）
 
-オペレータを2つ重ねることで，高周波数成分を持つ波形を合成できますが，別のやり方としてあるオペレータの出力を同オペレータの周波数入力につなげることで複雑な波形を作り出すことが可能です．以下のプログラムで行っています．
+```javascirpt runnable editable console
+// nameがradio02の要素を取得→checkedを探す
 
-実際には，以下の図のように，lfoで880Hzの周波数を作り，gainFeedbackを通じてlfoの周波数入力に接続しています．lfoの出力はgainLfoで増幅され，vco1の周波数入力に繋いでいます．
-
-<img src="./img/audio04-03.png" width="80%" />
-
-以下のプログラムを実行してみてください．その後，lfoの周波数やgainFeedbackとgainLfoのゲインを変更して実行してください．
-
-```javascript sandbox editable
-// オシレータを2つ作ってLFOの周波数を上げるとFM音源の元になる
-
-// LFO関係（注：FM音源ではModulatorと呼ばれている）
-var lfo = audioCtx.createOscillator();
-lfo.frequency.value = 440*2;
-
-var gainLfo = audioCtx.createGain();
-gainLfo.gain.value = 800;
-
-// Feedback関係
-var gainFb = audioCtx.createGain();
-gainFb.gain.value = 200;
-
-// VCO1関係（注：FM音源ではCarrierと呼ばれている）
-var vco1 = audioCtx.createOscillator();
-vco1.frequency.value = 440;
-vco1.type="sine";
-
-var gainVco1 = audioCtx.createGain();
-gainVco1.gain.value = 0.9;
-
-// 接続
-lfo.connect( gainLfo );
-lfo.connect( gainFb );
-gainFb.connect( lfo.frequency );
-gainLfo.connect( vco1.frequency );
-vco1.connect( gainVco1 );
-gainVco1.connect( audioCtx.destination );
-
-// 音を出す
-lfo.start();
-vco1.start();
-
-// 音を止める
-setTimeout( function(){
-lfo.stop();
-vco1.stop();
-}, 3000 );
+var inputs = document.getElementsByName( 'radio02' );
+var target = undefined;
+for( var elm of inputs ) {
+  if( elm.checked == true ) {
+    target = elm;
+  }
+}
+console.log( target.value );
 ```
 
-## エンベロープを付ける
+### nameで指定する場合（querySelector使用）
 
-シンセサイザーの仕組みを模すことで様々な音を作ることができますが，実際の楽器音は鳴り始めから鳴り終わるまでに音量が刻々と変化します．この音量の変化を作る仕組みはVCAやエンベロープと呼ばれています．
+```javascirpt runnable editable console
+// nameがradio02の要素の内checkedを抽出
 
-具体的には，以下の図のAttack，Decay，Releaseの時間とSustainレベルを定めています．
-<img src="./img/audio04-05.png" width="80%" />
-
-そのために，gainVcfを追加し，このゲインを時間変化させます．なお，さらに複雑な音をだすために各オペレータの出力にエンベロープを設定することがあります．
-
-<img src="./img/audio04-04.png" width="80%" />
-
-次のプログラムを実行してください．その後，音を鳴らしている下にある，gainVcfの各種パラメータを調整してみてください．
-
-```javascirpt sandbox editable
-// エンベロープの設定
-
-// LFO関係（注：FM音源ではModulatorと呼ばれている）
-var lfo = audioCtx.createOscillator();
-lfo.frequency.value = 223;
-
-var gainLfo = audioCtx.createGain();
-gainLfo.gain.value = 0.8;
-
-// Feedback関係
-var gainFb = audioCtx.createGain();
-gainFb.gain.value = 200;
-
-// VCO1関係（注：FM音源ではCarrierと呼ばれている）
-var vco1 = audioCtx.createOscillator();
-vco1.frequency.value = 220;
-vco1.type="sine";
-
-var gainVco1 = audioCtx.createGain();
-gainVco1.gain.value = 0.8;
-
-var gainVcf = audioCtx.createGain();
-gainVcf.gain.value = 1;
-
-// 接続
-lfo.connect( gainLfo );
-lfo.connect( gainFb );
-gainFb.connect( lfo.frequency );
-gainLfo.connect( gainVcf );
-vco1.connect( gainVco1 );
-gainVco1.connect( gainVcf );
-gainVcf.connect( audioCtx.destination );
-
-// 音を出す
-lfo.start();
-vco1.start();
-
-// エンベロープ設定
-var now = audioCtx.currentTime;
-var volume = 1;
-var attack = 0.0 // attackに要する時間 [sec]
-var decay = 0.2; // decayする時間 [sec]
-var sustain = 0.8; // sustainレベル
-var release = 0.5; // キーオフしてからの時間 [sec]
-
-gainVcf.gain.cancelScheduledValues( 0 );
-gainVcf.gain.setValueAtTime( 0.0, now );
-gainVcf.gain.linearRampToValueAtTime( volume, now + attack );
-gainVcf.gain.linearRampToValueAtTime( sustain * volume, now + attack + decay );
-gainVcf.gain.linearRampToValueAtTime( 0.0, now + attack + decay + release );
-
-// 音を止める
-setTimeout( function(){
-lfo.stop();
-vco1.stop();
-}, 3000 );
+var target = document.querySelector( '[name="radio02"]:checked' );
+console.log( target.value );
 ```
 
-## アナログシンセサイザーのオシレータ構成
+## DOMおよびDOMツリーとは？
 
-アナログシンセサイザーでは，複数のVCOを組み合わせ，片方の周波数を微妙にずらし（デチューンと呼ばれています）合成して複雑な波形を作り出していました．以下のプログラムでは，vco2の音を若干低くして，vco1の音と合成しています．
+HTMLでは，html要素の中にhead要素とbody要素があり，body要素の中にページを構成する各要素が格納されています．言い換えると，documentをトップとした階層構造になっています．
 
-オシレータの接続は以下の図のようになります．lfoの出力をvco1とvco2の周波数入力に繋いでいます．
+この階層構造になっている中から，プログラムの動作に必要なデータを取得する必要があり，そのためのインタフェースをDOM（Document Object Model）と呼んでいます．最も原始的な要素の取得方法では，ある要素の下にある要素（子要素）を取得する場合「n番目の子要素を取得」などのようなプログラムを書くこともできます．しかし，それでは要素が挿入されたり削除されたりした場合に煩雑な処理が必要になるため，上で説明したようにIDやクラス名から要素を取得できるようになっています．
 
-<img src="./img/audio04-06.png" width="80%">
+また，要素の階層構造は木構造になっているので，一般的にDOMツリーと呼ばれています．
 
-プログラム中では，```vco2.detune.value = -30```としています．この値の単位は「セント」と呼ばれ，100になると半音上がります．
+例えば以下のようなHTMLファイルが有ったとします．
 
-```javascript sandbox editable
-// アナログシンセイサイザー的な音作り：オシレータを3つ作ってビブラートを再現する
-
-// LFO関係
-var lfo = audioCtx.createOscillator();
-lfo.frequency.value = 2;
-
-var gainLfo = audioCtx.createGain();
-gainLfo.gain.value = 1;
-
-// VCO1関係
-var vco1 = audioCtx.createOscillator();
-vco1.frequency.value = 440;
-vco1.type="sawtooth";
-
-var gainVco1 = audioCtx.createGain();
-gainVco1.gain.value = 0.3;
-
-// VCO2関係
-var vco2 = audioCtx.createOscillator();
-vco2.frequency.value = 440;
-vco2.type="sawtooth";
-vco2.detune.value = -30;
-
-var gainVco2 = audioCtx.createGain();
-gainVco2.gain.value = 0.3;
-
-// 接続
-lfo.connect( gainLfo );
-gainLfo.connect( vco1.frequency );
-gainLfo.connect( vco2.frequency );
-vco1.connect( gainVco1 );
-vco2.connect( gainVco2 );
-gainVco1.connect( audioCtx.destination );
-gainVco2.connect( audioCtx.destination );
-
-// 音を出す
-lfo.start();
-vco1.start();
-vco2.start();
-
-// 音を止める
-setTimeout( function(){
-lfo.stop();
-vco1.stop();
-vco2.stop();
-}, 3000 );
+```html hl
+&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Sample&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;This is a test.&lt;/h1&gt;
+    &lt;div id="result1"&gt;&lt;/div&gt;
+    &lt;div id="result2"&gt;&lt;/div&gt;
+    &lt;div id="result3"&gt;&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
 ```
 
-## Lowpassフィルタ
+このとき，body内の最初の要素を取得したい場合には，以下のように実行します．参考までに要素のことをノードとも呼びます．
 
-WebAudioAPIでは，ローパスフィルタやハイパスフィルタ，バンドパスフィルタなどを使用できます．これらはまとめて```BiquadFilterNode```と呼ばれています．
+「子要素の0番目ではないの？」と思うかもしれませんが，0番目には改行が入っています．違和感があると思いますが，改行も要素として認識されます．
 
-オシレータの接続は以下のとおりです．vcfに```BiquadFilterNode```によるローパスフィルターを設定し，高周波数成分をカットします．
+```javascript hl
+// 実行できません
 
-<img src="./img/audio04-07.png" width="80%">
-
-以下のプログラムは，10kHz以下の音を通すように設定しています．
-
-```javascript sandbox editable
-// Lowpassフィルターを使う
-
-// LFO関係
-var lfo = audioCtx.createOscillator();
-lfo.frequency.value = 2;
-
-var gainLfo = audioCtx.createGain();
-gainLfo.gain.value = 1;
-
-// VCO1関係
-var vco1 = audioCtx.createOscillator();
-vco1.frequency.value = 440;
-vco1.type="sawtooth";
-
-var gainVco1 = audioCtx.createGain();
-gainVco1.gain.value = 0.3;
-
-// VCO2関係
-var vco2 = audioCtx.createOscillator();
-vco2.frequency.value = 440;
-vco2.type="sawtooth";
-vco2.detune.value = -10;
-
-var gainVco2 = audioCtx.createGain();
-gainVco2.gain.value = 0.3;
-
-// VCF関係
-var vcf = audioCtx.createBiquadFilter();
-vcf.frequency.value = 10000;
-
-var gainVcf = audioCtx.createGain();
-gainVcf.gain.value = 0.5;
-
-// 接続
-lfo.connect( gainLfo );
-gainLfo.connect( vco1.frequency );
-gainLfo.connect( vco2.frequency );
-gainLfo.connect( vco2.detune );
-vco1.connect( gainVco1 );
-vco2.connect( gainVco2 );
-gainVco1.connect( vcf );
-gainVco2.connect( vcf );
-vcf.connect( gainVcf );
-gainVcf.connect( audioCtx.destination );
-
-// 音を出す
-lfo.start();
-vco1.start();
-vco2.start();
-
-// 音を止める
-setTimeout( function(){
-lfo.stop();
-vco1.stop();
-vco2.stop();
-}, 3000 );
+var first = document.body.childNodes[1];
+// firstの内容はh1要素となります
 ```
 
-## エンベロープを付ける
-
-アナログシンセイサイザーのような構成にしても，エンベロープを付けることができます．オシレータの構成は1つ上と同じです．ここでgainVcfにエンベロープの設定を行っています．
-
-<img src="./img/audio04-07.png" width="80%">
-
-```javascript sandbox editable
-// エンベロープを付ける
-
-// LFO関係
-var lfo = audioCtx.createOscillator();
-lfo.frequency.value = 2;
-
-var gainLfo = audioCtx.createGain();
-gainLfo.gain.value = 1;
-
-// VCO1関係
-var vco1 = audioCtx.createOscillator();
-vco1.frequency.value = 440;
-vco1.type="sawtooth";
-
-var gainVco1 = audioCtx.createGain();
-gainVco1.gain.value = 0.3;
-
-// VCO2関係
-var vco2 = audioCtx.createOscillator();
-vco2.frequency.value = 440;
-vco2.type="sawtooth";
-vco2.detune.value = -10;
-
-var gainVco2 = audioCtx.createGain();
-gainVco2.gain.value = 0.3;
-
-// VCF関係
-var vcf = audioCtx.createBiquadFilter();
-vcf.frequency.value = 10000;
-
-var gainVcf = audioCtx.createGain();
-var volume = 0.5;
-gainVcf.gain.value = volume;
-
-// 接続
-lfo.connect( gainLfo );
-gainLfo.connect( vco1.frequency );
-gainLfo.connect( vco2.frequency );
-gainLfo.connect( vco2.detune );
-vco1.connect( gainVco1 );
-vco2.connect( gainVco2 );
-gainVco1.connect( vcf );
-gainVco2.connect( vcf );
-vcf.connect( gainVcf );
-gainVcf.connect( audioCtx.destination );
-
-// 音を出す
-lfo.start();
-vco1.start();
-vco2.start();
-
-// エンベロープ設定
-var now = audioCtx.currentTime;
-var attack = 0.1 // attackに要する時間 [sec]
-var decay = 0.3; // decayする時間 [sec]
-var sustain = 0.2; // sustainレベル
-var release = 0.5; // キーオフしてからの時間 [sec]
-
-gainVcf.gain.cancelScheduledValues( 0 );
-gainVcf.gain.setValueAtTime( 0.0, now );
-gainVcf.gain.linearRampToValueAtTime( volume, now + attack );
-gainVcf.gain.linearRampToValueAtTime( sustain * volume, now + attack + decay );
-gainVcf.gain.linearRampToValueAtTime( 0.0, now + attack + decay + release );
-
-// 音を止める
-setTimeout( function(){
-lfo.stop();
-vco1.stop();
-vco2.stop();
-}, 3000 );
-```
 
 </jsn-md>
 </div>
