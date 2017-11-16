@@ -29,6 +29,8 @@
 そのような場合は，```getElementById```関数を使用して要素を取得し，要素内の```value```の内容を取得するという手順で実行します．
 
 ```javascript sandbox editable console
+// valueの内容　＝　枠内の文字列を取得します
+
 var value = document.getElementById( "input01" ).value;
 console.log( value );
 ```
@@ -36,15 +38,16 @@ console.log( value );
 同様に```type```の内容を取得するにはどうすれば良いでしょうか？上のプログラムから予想できるとおり，プログラムは以下のようになります．
 
 ```javascript sandbox editable console
+// typeを取得します
 var type = document.getElementById( "input01" ).type;
 console.log( type );
 ```
 
-あまり```type```を取得する場面はないと思いますが，例えばアンケートフォームのように並んでいるラジオボタンやチェックボックスの内容を全て取得したいようなときに役に立ちます．
+あまり```type```を取得する場面はないと思いますが，独自のパラメータを付けておいてあとで読み取る際などに役に立ちます．
 
 ## 要素または要素群を取得する
 
-以下に，要素または要素群を取得する関数一覧を示します．使用例は次節以降で説明します．
+以下に，要素または要素群を取得する関数一覧を示します．細かい使用例は次節以降で説明します．
 
 関数名 | 複数 | 意味
 --|--|--
@@ -54,7 +57,6 @@ getElementsByClassName | ○ | クラス名を指定して要素を取得
 getElementsByTagName | ○ | タグ名を指定して要素を取得
 querySelector | | CSSセレクタを指定して要素を取得
 querySelectorAll | ○ | CSSセレクタを指定して要素を取得
-
 
 ## 要素を全て取得する
 
