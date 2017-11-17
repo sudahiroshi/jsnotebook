@@ -11,7 +11,7 @@
 <body>
 <article>
 <jsn-md>
-要素を取得する
+要素を作成する
 ===============
 
 ## はじめに
@@ -113,12 +113,35 @@ var linkText = document.createTextNode( "グーグルへのリンク" );
 link.appendChild( linkText ); // 追加します
 ```
 
-さらにリンク先の情報を追加します．要素のパラメータへの設定は「要素の変数.パラメータ名」に代入することで行なえます．ここまで終わるとクリックできるようになります．
+さらにリンク先の情報を追加します．要素にアトリビュート名が存在する場合，アトリビュートへの設定は「要素の変数.アトリビュート名」に代入することで行なえます．リンク先の情報は```href```というアトリビュートに格納する決まりなので以下のように記述します．ここまで終わるとクリックできるようになります．
 
 ```javascript runnable editable
 // リンクテキストを追加する
 
 link.href = "http://www.google.co.jp/";
+```
+
+## アトリビュート
+
+先の例では，アトリビュート```href```にURLを代入しましたが，存在しないアトリビュートに代入することはできません．存在しないアトリビュートを追加する場合は```setAttribute```関数を使用して以下のように記述します．
+
+```javascript runnable editable
+// アトリビュートを追加する
+// 前節のプログラムを実行した後に以下を実行してください
+
+link.setAttribute( "foo", "bar" );
+```
+
+また，アトリビュートを取得する場合は```getAttributeNode```関数や```attributes``` を使用して以下のように記述します．
+
+```javascript runnable editable console
+// アトリビュートを取得する
+
+var attr1 = link.getAttributeNode( "foo" ).value;
+console.log( attr1 );
+
+var attr2 = link.attributes[ "foo" ].value;
+console.log( attr2 );
 ```
 
 </jsn-md>
