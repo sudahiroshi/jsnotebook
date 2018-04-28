@@ -97,7 +97,7 @@ var setSandbox = ( div, element ) => {
     });
 };
 
-window.addEventListener('load', function() {
+window.addEventListener('DOMContentLoaded', function() {
     showdown.setFlavor('github');
 
     output = undefined;
