@@ -1,0 +1,115 @@
+---
+title: 畳み込み演算
+layout: src/templates/layout.pug
+---
+
+# 畳み込み演算
+
+## はじめに
+
+WebAudioAPI は，標準で畳み込み演算の機能を持っており，コンボルバーノードと呼ばれています．インパルス応答は，外部ファイルを読み込むことも，プログラム中で配列に数値を入れることでも実現できます．このページのプログラムでは，配列に数値を入れています．まずは以下を実行してください．
+
+```javascript once editable
+// はじめに1回だけ実行してください
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
+var audioCtx = new AudioContext();
+```
+
+その後，以下の枠を順に実行してください．なお，何回でも実行可能です．
+
+```javascript runnable editable
+// 畳み込み演算の例
+
+// LFO関係（注：FM音源ではModulatorと呼ばれている）
+var lfo = audioCtx.createOscillator();
+lfo.frequency.value = 223;
+
+var gainLfo = audioCtx.createGain();
+gainLfo.gain.value = 0.8;
+
+// Feedback関係
+var gainFb = audioCtx.createGain();
+gainFb.gain.value = 200;
+
+// VCO1関係（注：FM音源ではCarrierと呼ばれている）
+var vco1 = audioCtx.createOscillator();
+vco1.frequency.value = 220;
+vco1.type = "sine";
+
+var gainVco1 = audioCtx.createGain();
+gainVco1.gain.value = 0.8;
+
+// エンベロープ関連
+var gainVcf = audioCtx.createGain();
+gainVcf.gain.value = 1;
+```
+
+以下の部分が，インパルス応答を定義する部分です．左右のチャンネル（chanL と chanR）に分かれており，独立した数値を入れることも可能です．なお，`audioCtx.sampleRate`には，WebAudioAPI が内部的に使用するサンプリング周波数が入っています．
+
+プログラム中の`audioCtx.createBuffer`のパラメータは以下のとおりです．
+
+-   チャンネル数
+-   インパルス応答の要素数（サンプリング周波数 ☓ 秒数を与える）
+-   サンプリング周波数
+
+その下にある配列への代入によって，インパルス応答を作成しています．代入できる値は-1〜+1 です．タイミングや音量を調整することで，様々な空間を再現することが可能です．
+
+```javascript runnable editable
+// バッファ作成
+var arr = audioCtx.createBuffer(
+    2,
+    audioCtx.sampleRate * 1.0,
+    audioCtx.sampleRate
+);
+var chanL = arr.getChannelData(0);
+var chanR = arr.getChannelData(1);
+
+chanL[0] = chanR[0] = 1.0;
+chanL[44100 / 4 + 44100 / 8] = chanR[44100 / 4 + 44100 / 8] = 0.8;
+chanL[44100 / 2] = chanR[44100 / 2] = 0.6;
+```
+
+以下の部分で，実際に音を出しています．音はベースのような音です．
+
+```javascript runnable editable
+console.log(arr);
+// 畳み込み関連
+var convNode = audioCtx.createConvolver();
+convNode.buffer = arr;
+
+// 接続
+lfo.connect(gainLfo);
+lfo.connect(gainFb);
+gainFb.connect(lfo.frequency);
+gainLfo.connect(gainVcf);
+vco1.connect(gainVco1);
+gainVco1.connect(gainVcf);
+gainVcf.connect(convNode);
+convNode.connect(audioCtx.destination);
+
+// 音を出す
+lfo.start();
+vco1.start();
+
+// エンベロープ設定
+var now = audioCtx.currentTime;
+var volume = 1;
+var attack = 0.0; // attackに要する時間 [sec]
+var decay = 0.2; // decayする時間 [sec]
+var sustain = 0.8; // sustainレベル
+var release = 0.5; // キーオフしてからの時間 [sec]
+
+gainVcf.gain.cancelScheduledValues(0);
+gainVcf.gain.setValueAtTime(0.0, now);
+gainVcf.gain.linearRampToValueAtTime(volume, now + attack);
+gainVcf.gain.linearRampToValueAtTime(sustain * volume, now + attack + decay);
+gainVcf.gain.linearRampToValueAtTime(0.0, now + attack + decay + release);
+
+// 音を止める
+setTimeout(function() {
+    lfo.stop();
+    vco1.stop();
+}, 3000);
+```
+
+</div>

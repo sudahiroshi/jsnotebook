@@ -1,0 +1,16 @@
+{
+  "filters": {},
+  "rules": {
+    "preset-ja-technical-writing": {
+      "ja-no-mixed-period": {
+        "periodMark": "．"
+      },
+      "ja-no-weak-phrase": false,
+      "max-kanji-continuous-len": {
+        max: 10,
+      },
+      "no-exclamation-question-mark": false,
+      "ja-no-successive-word": false,
+    }
+  }
+}

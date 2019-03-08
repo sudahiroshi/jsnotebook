@@ -1,0 +1,75 @@
+{
+  "name": "jsnotebook",
+  "version": "1.0.0",
+  "description": "jsnotebook",
+  "main": "index.js",
+  "engines": {
+    "node": "10.15.x",
+    "npm": "6.4.x"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "build:prod": "NODE_ENV=production gulp build",
+    "watch": "gulp watch",
+    "serve": "gulp build && http-server dist -p 3000",
+    "clean": "gulp clean",
+    "lint:text": "textlint -c .textlintrc {src/**/*.md,README.md}",
+    "lint:text:fix": "textlint -c .textlintrc --fix {src/**/*.md,README.md}",
+    "lint:style": "stylelint --config .stylelintrc.json src/**/*.scss",
+    "lint:style:fix": "stylelint --config .stylelintrc.json  --fix src/**/*.scss"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sudahiroshi/jsnotebook.git"
+  },
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/sudahiroshi/jsnotebook/issues"
+  },
+  "homepage": "https://github.com/sudahiroshi/jsnotebook#readme",
+  "dependencies": {
+    "entities": "^1.1.2",
+    "events": "^3.0.0",
+    "highlight.js": "^9.15.6",
+    "showdown": "^1.8.0",
+    "through2": "^3.0.1",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/register": "^7.0.0",
+    "@fortawesome/fontawesome-free": "^5.7.2",
+    "autoprefixer": "^9.4.10",
+    "babel-loader": "^8.0.5",
+    "browserslist": "^4.4.2",
+    "del": "^4.0.0",
+    "editorconfig": "^0.15.3",
+    "eslint": "^5.15.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-loader": "^2.1.2",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "gulp": "^4.0.0",
+    "gulp-front-matter": "^1.3.0",
+    "gulp-layout": "0.0.4",
+    "gulp-notify": "^3.2.0",
+    "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^8.0.0",
+    "gulp-prettier": "^2.1.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "http-server": "^0.11.1",
+    "pug": "^2.0.3",
+    "stylelint": "^9.10.1",
+    "stylelint-config-standard": "^18.2.0",
+    "stylelint-scss": "^3.5.4",
+    "textlint": "^11.2.3",
+    "textlint-rule-preset-ja-technical-writing": "^3.1.2",
+    "webpack": "^4.29.6",
+    "webpack-stream": "^5.2.1"
+  }
+}
