@@ -86,12 +86,17 @@ export class RunnableOnce extends Runnable {
     super(elementNode);
 
     this.buttonLabel = 'Once';
-
     this.on('done', () => this.button.setAttribute('disabled', 'disabled'));
   }
 }
 
 export class RunnableSandbox extends Runnable {
+  constructor(elementNode) {
+    super(elementNode);
+
+    this.buttonLabel = 'Sandbox';
+  }
+
   static eval(code) {
     // eslint-disable-next-line no-eval, no-console
     eval(code); // Magic.2: direct eval call. evaluates code as in current scope.
