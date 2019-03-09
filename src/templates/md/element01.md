@@ -94,7 +94,7 @@ var inputElm = document.getElementsByTagName("input");
 console.log(inputElm.length + "個の要素を取得しました");
 ```
 
-しかし，ページ内に存在する他の input タグも一緒に抽出されてしまっています．そこで，以下のようにして1つ1つの内容を見て，`type=="radio"`の項目を抽出します．ちょっと面倒ですね．
+しかし，ページ内に存在する他の input タグも一緒に抽出されてしまっています．そこで，以下のようにして 1 つ 1 つの内容を見て，`type=="radio"`の項目を抽出します．ちょっと面倒ですね．
 
 ```javascript runnable editable console
 // inputElmの中からtypeがradioのものを抽出します

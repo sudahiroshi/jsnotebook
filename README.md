@@ -31,7 +31,7 @@ JS Notebook とは，主に JavaScript の自主学習で使用することを�
 #### ローカルでの利用方法
 
 コマンドライン等から `npm run serve` を実行するとトランスパイルが実行され，内部で Web server が起動します．
-起動後， http://localhost:8000 を開くとアクセス可能です．
+起動後， http://localhost:3000 を開くとアクセス可能です．
 
 内部 Web server を終了する場合，上記コマンドを実行されているコマンドライン上で <kbd>Ctrl</kbd> + <kbd>C</kbd> を押下してください．
 または，それに準じた操作をしてください．
