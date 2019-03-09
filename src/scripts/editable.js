@@ -1,24 +1,10 @@
-import EventEmitter from 'events';
-import entities from 'entities';
+import { CodeElement } from './code-element';
 import hljs from './highlight';
 
-export class Editable extends EventEmitter {
+export class Editable extends CodeElement {
   constructor(elementNode) {
-    super();
+    super(elementNode);
 
-    this.elementNode = elementNode;
-    this.initialize();
-  }
-
-  set code(html) {
-    this.elementNode.innerHTML = entities.encodeHTML(html);
-  }
-
-  get code() {
-    return entities.decodeHTML(this.elementNode.textContent);
-  }
-
-  initialize() {
     this.elementNode.setAttribute('contenteditable', 'true');
     this.elementNode.setAttribute('spellcheck', 'false');
 
@@ -26,6 +12,8 @@ export class Editable extends EventEmitter {
   }
 
   listen() {
+    super.listen();
+
     this.elementNode.addEventListener('blur', this.highlight.bind(this));
   }
 
@@ -36,8 +24,9 @@ export class Editable extends EventEmitter {
 }
 
 export class EditableImmute extends Editable {
-  initialize() {
-    super.initialize();
+  constructor(elementNode) {
+    super(elementNode);
+
     this.elementNode.setAttribute('contenteditable', 'false');
   }
 }

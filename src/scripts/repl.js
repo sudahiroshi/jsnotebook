@@ -1,6 +1,6 @@
-export function listen(codeElements, RunnableConstructor) {
-  codeElements.forEach((elm) => {
-    const runnable = new RunnableConstructor(elm);
+export function listen(elementNodes, CodeElementConstructor) {
+  elementNodes.forEach((elm) => {
+    const runnable = new CodeElementConstructor(elm);
     runnable.listen();
   });
 }

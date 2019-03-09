@@ -1,13 +1,12 @@
-import EventEmitter from 'events';
 import uuid from 'uuid/v1';
 import entities from 'entities';
+import { CodeElement } from './code-element';
 import { Console } from './console';
 
-export class Runnable extends EventEmitter {
+export class Runnable extends CodeElement {
   constructor(elementNode) {
-    super();
+    super(elementNode);
 
-    this.elementNode = elementNode;
     this.console = new Console();
     this.button = this.constructor.createButton();
     this.buttonLabel = 'Run';
@@ -21,10 +20,6 @@ export class Runnable extends EventEmitter {
 
   get buttonLabel() {
     return this.button.textContent;
-  }
-
-  get code() {
-    return entities.decodeHTML(this.elementNode.textContent);
   }
 
   deploy() {
@@ -41,6 +36,8 @@ export class Runnable extends EventEmitter {
   }
 
   listen() {
+    super.listen();
+
     this.button.addEventListener('click', () => {
       this.run();
     });
