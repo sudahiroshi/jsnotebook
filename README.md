@@ -7,6 +7,7 @@ JS Notebookとは，主にJavaScriptの自主学習で使用することを想�
 以下のページで公開しています．
 
 [JS Notebook](https://jsnotebook.sudalab.net/)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b2ac7bfb-6dc4-4651-8f3f-68a8f44e5a6a/deploy-status)](https://app.netlify.com/sites/jsnotebook/deploys)
 
 ### 技術情報
 
