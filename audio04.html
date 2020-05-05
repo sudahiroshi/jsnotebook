@@ -44,7 +44,7 @@ var audioCtx = new AudioContext();
 
 そのために，オシレータを以下の図のように接続します．図中の```lfo```と```vco1```がオシレータで，lfoにより2Hzで発信している信号を，vco1の周波数入力として扱います．
 
-<img src="./img/audio04-01.png" width="80%" />
+<img src="./img/audio04-01.svg" width="80%" />
 
 これをプログラムで書くと以下のように鳴ります．
 
@@ -89,7 +89,7 @@ FM音源とは，ビブラートを作るための1つ目のオシレータの�
 
 FM音源では，通常2〜4個のオシレータ（FM音源の世界ではオペレータと呼ばれる）を接続して音を作ります．ここでは以下のように2つのオペレータを直列に繋ぎ，lfoの周波数を1320Hz，logのゲインを1500としています．これをvco1の周波数入力に繋いで音を作っています．
 
-<img src="./img/audio04-02.png" width="80%" />
+<img src="./img/audio04-02.svg" width="80%" />
 
 以下のプログラムを実行してみてください．その後，lfoの周波数やgainLfoのゲインを変更して実行してください．
 
@@ -134,7 +134,7 @@ setTimeout( function(){
 
 実際には，以下の図のように，lfoで880Hzの周波数を作り，gainFeedbackを通じてlfoの周波数入力に接続しています．lfoの出力はgainLfoで増幅され，vco1の周波数入力に繋いでいます．
 
-<img src="./img/audio04-03.png" width="80%" />
+<img src="./img/audio04-03.svg" width="80%" />
 
 以下のプログラムを実行してみてください．その後，lfoの周波数やgainFeedbackとgainLfoのゲインを変更して実行してください．
 
@@ -183,12 +183,12 @@ setTimeout( function(){
 
 シンセサイザーの仕組みを模すことで様々な音を作ることができますが，実際の楽器音は鳴り始めから鳴り終わるまでに音量が刻々と変化します．この音量の変化を作る仕組みはVCAやエンベロープと呼ばれています．
 
-具体的には，以下の図のAttack，Decay，Releaseの時間とSustainレベルを定めています．
-<img src="./img/audio04-05.png" width="80%" />
+具体的には，以下の図のAttack（立ち上がり），Decay（減衰），Release（余韻）の時間とSustain（減衰後の保持）レベルを定めています．
+<img src="./img/audio04-05.svg" width="80%" />
 
 そのために，gainVcfを追加し，このゲインを時間変化させます．なお，さらに複雑な音をだすために各オペレータの出力にエンベロープを設定することがあります．
 
-<img src="./img/audio04-04.png" width="80%" />
+<img src="./img/audio04-04.svg" width="80%" />
 
 次のプログラムを実行してください．その後，音を鳴らしている下にある，gainVcfの各種パラメータを調整してみてください．
 
@@ -257,7 +257,7 @@ setTimeout( function(){
 
 オシレータの接続は以下の図のようになります．lfoの出力をvco1とvco2の周波数入力に繋いでいます．
 
-<img src="./img/audio04-06.png" width="80%">
+<img src="./img/audio04-06.svg" width="80%">
 
 プログラム中では，```vco2.detune.value = -30```としています．この値の単位は「セント」と呼ばれ，100になると半音上がります．
 
@@ -316,9 +316,9 @@ WebAudioAPIでは，ローパスフィルタやハイパスフィルタ，バン
 
 オシレータの接続は以下のとおりです．vcfに```BiquadFilterNode```によるローパスフィルターを設定し，高周波数成分をカットします．
 
-<img src="./img/audio04-07.png" width="80%">
+<img src="./img/audio04-07.svg" width="80%">
 
-以下のプログラムは，10kHz以下の音を通すように設定しています．
+ローパスフィルタに設定する周波数は，以下のプログラムでは`vcf.frequency.value`に代入している値となります．現在は`10000`を指定して10kHz以下の音を通すように設定しています．この値を変更して，ローパスフィルタのかかり具合を体験してみてください．
 
 ```javascript sandbox editable
 // Lowpassフィルターを使う
@@ -349,6 +349,7 @@ gainVco2.gain.value = 0.3;
 
 // VCF関係
 var vcf = audioCtx.createBiquadFilter();
+vcf.type = "lowpass";
 vcf.frequency.value = 10000;
 
 var gainVcf = audioCtx.createGain();
@@ -383,7 +384,7 @@ setTimeout( function(){
 
 アナログシンセイサイザーのような構成にしても，エンベロープを付けることができます．オシレータの構成は1つ上と同じです．ここでgainVcfにエンベロープの設定を行っています．
 
-<img src="./img/audio04-07.png" width="80%">
+<img src="./img/audio04-08.svg" width="80%">
 
 ```javascript sandbox editable
 // エンベロープを付ける
