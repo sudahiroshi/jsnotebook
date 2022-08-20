@@ -117,6 +117,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // &, >, <を置き換える
     var pres = document.querySelectorAll( 'pre code.javascript' );
+    console.log(pres);
     pres.forEach( function( value ) {
         let code = value.textContent.replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>' ).replace( / /g, '&nbsp;' );
         value.innerHTML = code;
@@ -192,4 +193,11 @@ window.addEventListener('DOMContentLoaded', function() {
         block.innerHTML = block.innerHTML.replace( /&amp;/g, '&' ).replace( / /g, '&nbsp;' );
         hljs.highlightBlock( block );
     });
+
+    // Mermaidの要素を修正する
+    var code = document.querySelectorAll( 'pre code.mermaid' );
+    code.forEach( function(block) {
+        block.innerHTML = block.innerHTML.replace( /<br>/g, "\r\n" )
+        .replace( /&nbsp;/g," ").replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>'  );
+    })
 });
