@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/styles/xcode.css">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
+    <script src="/js/mermaid.min.js" defer></script>
     <script src="./js/jsnotebook.js"></script>
 <body>
 <article>
@@ -59,6 +60,16 @@ gainNode.connect( audioCtx.destination );
 ```
 
 アナライザーノードを初期化し，FFTを行うサンプル数を設定します．その後，ゲインノード→アナライザーノードを接続します．
+上のプログラムと下のプログラムを図にすると以下のようになります．
+
+```mermaid
+graph LR
+    osc1 -- connect --> gainNode
+    osc2 -- connect --> gainNode
+    osc3 -- connect --> gainNode
+    gainNode -- connect --> destination
+    gainNode -- connect --> analyserNode
+```
 
 ```javascript runnable editable
 // アナライザーノードの初期化
@@ -79,7 +90,7 @@ osc3.start();
 音が出ている状態で以下のプログラムを実行すると，グラフが描画されます．この部分は何度でも実行可能です．
 ```javascirpt runnable editable
 // 時間領域のグラフを描画します．
-var timeData = new Uint8Array( 1024 );
+let timeData = new Uint8Array( 1024 );
 
 // getByteTimeDomainDataで時間領域のデータを取得
 analyserNode.getByteTimeDomainData( timeData );
@@ -97,11 +108,11 @@ g1.stroke();
 g1.beginPath();
 g1.strokeStyle = 'rgb( 100, 10, 10 )';
 g1.moveTo( 10, 100 );
-for( var i=0; i<1024; i++ ) { g1.lineTo( (i/2)+10, 256 - timeData[i] ); }
+for( let i=0; i<1024; i++ ) { g1.lineTo( (i/2)+10, 256 - timeData[i] ); }
 g1.stroke();
 
 // 周波数領域のグラフを描画します．
-var freqData = new Uint8Array(512);
+let freqData = new Uint8Array(512);
 
 // getByteFrequencyDataで周波数領域のデータを取得
 analyserNode.getByteFrequencyData( freqData );
@@ -114,9 +125,9 @@ g2.stroke();
 
 g2.beginPath();
 g2.strokeStyle = 'rgb( 100, 10, 10 )';
-for( var i=0; i<51; i++ ) {
-g2.moveTo( i*10+10, 256 );
-g2.lineTo( i*10+10, 256 - freqData[i]/2.0 ); 
+for( let i=0; i<51; i++ ) {
+    g2.moveTo( i*10+10, 256 );
+    g2.lineTo( i*10+10, 256 - freqData[i]/2.0 );
 }
 g2.stroke();
 ```

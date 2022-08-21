@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/styles/xcode.css">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
+    <script src="/js/mermaid.min.js" defer></script>
     <script src="./js/jsnotebook.js"></script>
   </head>
 <body>
@@ -53,18 +54,18 @@ var audioCtx = new AudioContext();
 // オシレータを2つ作ってビブラートを再現する
 
 // LFO関係
-var lfo = audioCtx.createOscillator();
+let lfo = audioCtx.createOscillator();
 lfo.frequency.value = 2;
 
-var gainLfo = audioCtx.createGain();
+let gainLfo = audioCtx.createGain();
 gainLfo.gain.value = 1;
 
 // VCO1関係
-var vco1 = audioCtx.createOscillator();
+let vco1 = audioCtx.createOscillator();
 vco1.frequency.value = 440;
 vco1.type="sawtooth";
 
-var gainVco1 = audioCtx.createGain();
+let gainVco1 = audioCtx.createGain();
 gainVco1.gain.value = 0.3;
 
 // 接続
@@ -78,7 +79,7 @@ lfo.start();
 vco1.start();
 
 // 音を止める
-setTimeout( function(){
+setTimeout( function() {
   lfo.stop();
   vco1.stop();
 }, 3000 );
@@ -193,7 +194,7 @@ setTimeout( function(){
 
 次のプログラムを実行してください．その後，音を鳴らしている下にある，gainVcfの各種パラメータを調整してみてください．
 
-```javascirpt sandbox editable
+```javascript sandbox editable
 // エンベロープの設定
 
 // LFO関係（注：FM音源ではModulatorと呼ばれている）

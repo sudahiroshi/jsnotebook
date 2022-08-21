@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/styles/xcode.css">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
+    <script src="/js/mermaid.min.js" defer></script>
     <script src="./js/jsnotebook.js"></script>
 <body>
 <article>
@@ -24,9 +25,11 @@ window.AudioContext = window.webkitAudioContext || window.AudioContext;
 var audioCtx = new AudioContext();
 ```
 
-その後，以下の枠を順に実行してください．なお，何回でも実行可能です．
-
-```javascirpt runnable editable
+その後，以下の枠を順に実行してください．なお，上から順に実行すれば，何回でも実行可能です．
+</jsn-md>
+<div class="group01">
+<jsn-md>
+```javascript runnable editable
 // 畳み込み演算の例
 
 // LFO関係（注：FM音源ではModulatorと呼ばれている）
@@ -63,7 +66,7 @@ gainVcf.gain.value = 1;
 
 その下にある配列への代入によって，インパルス応答を作成しています．代入できる値は-1〜+1です．タイミングや音量を調整することで，様々な空間を再現することが可能です．
 
-```javascirpt runnable editable
+```javascript runnable editable
 // バッファ作成
 var arr = audioCtx.createBuffer( 2, audioCtx.sampleRate * 1.0, audioCtx.sampleRate );
 var chanL = arr.getChannelData( 0 );
@@ -74,9 +77,21 @@ chanL[44100/4+44100/8] = chanR[44100/4+44100/8] = 0.8;
 chanL[44100/2] = chanR[44100/2] = 0.6;
 ```
 
-以下の部分で，実際に音を出しています．音はベースのような音です．
+以下の部分で，実際に音を出しています．音はベースのような音です．Node同士の接続は以下の通りとなります．
 
-```javascirpt runnable editable
+```mermaid
+graph LR
+    lfo -- connect --> gainLfo
+    lfo -- connect --> gainFb
+    gainFb -- frequency --> lfo
+    gainLfo -- connect --> gainVcf
+    vco1 -- connect --> gainVco1
+    gainVco1 -- connect --> gainVcf
+    gainVcf -- connect --> convNode
+    convNode -- connect --> destination
+```
+
+```javascript runnable editable
 console.log( arr );
 // 畳み込み関連
 var convNode = audioCtx.createConvolver();
@@ -112,7 +127,7 @@ gainVcf.gain.linearRampToValueAtTime( sustain * volume, now + attack + decay );
 gainVcf.gain.linearRampToValueAtTime( 0.0, now + attack + decay + release );
 
 // 音を止める
-setTimeout( function(){
+setTimeout( () => {
 lfo.stop();
 vco1.stop();
 }, 3000 );

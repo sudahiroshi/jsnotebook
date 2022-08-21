@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/styles/xcode.css">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
+    <script src="/js/mermaid.min.js" defer></script>
     <script src="./js/jsnotebook.js"></script>
 <body>
 <article>
@@ -28,49 +29,57 @@
 
 次に，ボタンがクリックされた場合に処理を行うプログラムの例を示します．JavaScriptでは「○○されたら〜〜する」というプログラムを書く際，```addEventListener```を使用します．
 
-書式は，「要素.addEventListener( イベント名, やること )」です．要素とは，HTML内にあるオブジェクトのことで，ここでは「button1」というidを持つオブジェクトを```document.getElementById```で取得しています．ID以外にもタグ名やクラス名で取得することも可能ですが，処理が煩雑になるのでIDで取得するものとします．
+書式は，「要素.addEventListener( イベント名, やること )」です．要素とは，HTML内にあるオブジェクトのことで，ここでは「button1」というidを持つオブジェクトを```document.querySelector```で取得しています．ID以外にもタグ名やクラス名で取得することも可能ですが，処理が煩雑になるのでIDで取得するものとします．
 
 イベント名には「click」を指定しています．他にも「マウスが要素に乗った or 離れた」や「マウスのボタンが押下された」などのイベントを使うことができます．旧来の書き方で```onClick```を使う方法もありますが，この方法では複数のイベントを登録できないため現在は```addEventListener```を使う方法が主流です．
 
 「やること」はsetTimeoutと同様，functionを定義して与えます．このような関数は一般的に無名関数と呼ばれています．以下のプログラムでは，単純にコンソールに表示をしています．
 
-<button id="button1">クリックしてね</button>
 
 ```javascript once editable console
-// 先にこの枠内のプログラムを実行し，その後上にあるボタンをクリックしてください．
-var btn = document.getElementById( 'button1' ); // IDがbutton1の要素を取得し変数btnに入れる
+// 先にこの枠内のプログラムを実行し，その後下にあるボタンをクリックしてください．
+var btn = document.querySelector( '#button1' ); // IDがbutton1の要素を取得し変数btnに入れる
 btn.addEventListener( 'click', function( event ) { // btnにアクションを記述する
     console.log( "ボタンがクリックされた" ); // 表示
 });
 ```
 
+対象となるボタンは以下のように定義します．
+
+```html
+<button id="button1">クリックしてね</button>
+```
+
+下にあるボタンが，上記HTMLで実際に定義されたボタンです．
+<button id="button1">クリックしてね</button>
+
+
 ## ボタンがクリックされたら音を鳴らす
 
 前節では単純に表示をするのみでしたが，もっと複雑なプログラムを実行することも可能です．例えば音を鳴らしたい場合，無名関数内で音を鳴らすプログラムを記述すれば良いです．ただし，WebAudioAPIの制限でAudioContextオブジェクトの生成回数が制限されているため，この部分は最初に1回だけ実行する（＝ボタンのアクション内には書かない）ようにします．
+
+```javascript once editable
+// 先のこの枠内のプログラムを実行し，その後下にあるボタンをクリックしてください．
+// コンテクストの初期化
+window.AudioContext = window.webkitAudioContext || window.AudioContext;
+var audioCtx = new AudioContext();
+
+var btn = document.querySelector( '#button2' ); // IDがbutton2の要素を取得し変数btnに入れる
+btn.addEventListener( 'click', function( event ) { // btnにアクションを記述する
+
+    // 単純なSin波を鳴らす例
+    var oscNode = audioCtx.createOscillator();
+    oscNode.connect( audioCtx.destination );
+    oscNode.start();
+    setTimeout( function(){ oscNode.stop() }, 1000 );
+});
+```
 
 ```html hl
 <button id="button2">音を鳴らします</button>
 ```
 
 <button id="button2">音を鳴らします</button>
-
-```javascript once editable
-// 先のこの枠内のプログラムを実行し，その後上にあるボタンをクリックしてください．
-// コンテクストの初期化
-window.AudioContext = window.webkitAudioContext || window.AudioContext;
-var audioCtx = new AudioContext();
-
-var btn = document.getElementById( 'button2' ); // IDがbutton2の要素を取得し変数btnに入れる
-btn.addEventListener( 'click', function( event ) { // btnにアクションを記述する
-
-// 単純なSin波を鳴らす例
-var oscNode = audioCtx.createOscillator();
-oscNode.connect( audioCtx.destination );
-oscNode.start();
-setTimeout( function(){ oscNode.stop() }, 1000 );
-
-});
-```
 
 この例では単純なSin波を鳴らすのみですが，音色や音量を変えたり，三角波にするなど自由に改変できます．
 
@@ -80,7 +89,7 @@ setTimeout( function(){ oscNode.stop() }, 1000 );
 
 作成したクラスの例を以下に示します．JavaScriptではコンストラクタは```constructor```という名前のメソッドです．コンストラクタ内で使用している変数```this.freq```と```this.time```は，他の言語で言うインスタンス変数（メンバー変数）です．
 
-HTML上では，以下のように3つのボタンが有ることを想定します．
+HTML上では，以下のように3つのボタンが有ることを想定します．実際のボタンはプログラムの下にあります．
 
 ```html hl
 <button id="code_c">ド</button>
@@ -88,14 +97,8 @@ HTML上では，以下のように3つのボタンが有ることを想定しま
 <button id="code_e">ミ</button>
 ```
 
-まだボタンをクリックしても何も起きません．下のプログラムを実行後にクリックしてください．
-
-<button id="code_c">ド</button>
-<button id="code_d">レ</button>
-<button id="code_e">ミ</button>
-
 ```javascript once editable
-// 先のこの枠内のプログラムを実行し，その後上にあるボタンをクリックしてください．
+// 先のこの枠内のプログラムを実行し，その後下にあるボタンをクリックしてください．
 
 // コンテクストの初期化
 window.AudioContext = window.webkitAudioContext || window.AudioContext;
@@ -125,21 +128,25 @@ class Osc {
     
 }
 
-var code_c = document.getElementById( 'code_c' );
+var code_c = document.querySelector( '#code_c' );
 code_c.addEventListener( 'click', function( event ) {
     new Osc( 440 * Math.pow( 2, -9/12 ), 1000 ).play();
 });
 
-var code_d = document.getElementById( 'code_d' );
+var code_d = document.querySelector( '#code_d' );
 code_d.addEventListener( 'click', function( event ) {
     new Osc( 440 * Math.pow( 2, -7/12 ), 1000 ).play();
 });
 
-var code_e = document.getElementById( 'code_e' );
+var code_e = document.querySelector( '#code_e' );
 code_e.addEventListener( 'click', function( event ) {
     new Osc( 440 * Math.pow( 2, -5/12 ), 1000 ).play();
 });
 ```
+
+<button id="code_c">ド</button>
+<button id="code_d">レ</button>
+<button id="code_e">ミ</button>
 
 ## 実際にファイルを作ってみよう
 
@@ -163,8 +170,17 @@ code_e.addEventListener( 'click', function( event ) {
 
 後はscriptタグで指定している```keyboard.js```に前節のプログラムを入れれば動きそうな気もしますが，ここでもう1つ落とし穴が存在し，エラーが発生します．何故かと言うと，単純にJavaScriptを記述すると，Webブラウザ内でbuttonなどの要素を配置する前にプログラムが実行されてしまい，「'code_c'なんて無いよ！」とエラーになってしまいます．
 
-それを避けるために，HTML内の要素を参照する部分を「ページがロードされたら」というイベントのアクションに記述します．文法的には以下のように記述します．
+### エラーを防ぐ方法1
 
+それを避けるために，HTML内の要素を参照する部分を「ページがロードされたら」というイベントのアクションに記述します．文法的には以下のように記述します．もう少し正確に書くと，```load```イベントはDOMツリーが構築されすべての画像やスクリプトの読み込みが終わった時点で実行されます．同じような動作をするイベントとして```DOMContentLoaded```があり，こちらはDOMツリーの構築が終わった時点で実行されます．大抵の場合，どちらも同じように動作しますが，複数のスクリプトを読み込む場合は```load```の方が安全です．複数のスクリプトを読み込まず，画像にアクセスしない場合は```DOMContentLoaded```で良いでしょう．
+```mermaid
+graph TB
+    HTML --> JavaScript
+    JavaScript --> DOM構築 
+    DOM構築 --> DOMContentLoaded
+    DOMContentLoaded --> 画像のロード 
+    画像のロード --> load
+```
 ```javascript hl
 // 要素に関係ないプログラムを書く部分
 
@@ -175,7 +191,7 @@ window.addEventListener( "load", function() {
 });
 ```
 
-よって，鍵盤のプログラムは以下のようになります．コンテクストの初期化やクラス定義は要素に関係ないので```load```イベントの外に書いています．書式的にはこれらの処理を```load```イベント内に書いても正常に動作しますが，あとで読みづらく鳴るので外に出しています．
+よって，鍵盤のプログラムは以下のようになります．コンテクストの初期化やクラス定義は要素に関係ないので```load```イベントの外に書いています．書式的にはこれらの処理を```load```イベント内に書いても正常に動作しますが，あとで読みづらくなるので外に出しています．
 
 実際に，HTMLファイルとJSファイルをテキストエディタで作成して，Webブラウザで表示させてみてください．
 
@@ -210,23 +226,46 @@ class Osc {
 // ここからloadイベント
 window.addEventListener( "load", function() {
     
-var code_c = document.getElementById( 'code_c' );
-code_c.addEventListener( 'click', function( event ) {
-    new Osc( 440 * Math.pow( 2, -9/12 ), 1000 ).play();
-});
+    var code_c = document.querySelector( '#code_c' );
+    code_c.addEventListener( 'click', function( event ) {
+        new Osc( 440 * Math.pow( 2, -9/12 ), 1000 ).play();
+    });
 
-var code_d = document.getElementById( 'code_d' );
-code_d.addEventListener( 'click', function( event ) {
-    new Osc( 440 * Math.pow( 2, -7/12 ), 1000 ).play();
-});
+    var code_d = document.querySelector( '#code_d' );
+    code_d.addEventListener( 'click', function( event ) {
+        new Osc( 440 * Math.pow( 2, -7/12 ), 1000 ).play();
+    });
 
-var code_e = document.getElementById( 'code_e' );
-code_e.addEventListener( 'click', function( event ) {
-    new Osc( 440 * Math.pow( 2, -5/12 ), 1000 ).play();
-});
+    var code_e = document.querySelector( '#code_e' );
+    code_e.addEventListener( 'click', function( event ) {
+        new Osc( 440 * Math.pow( 2, -5/12 ), 1000 ).play();
+    });
 
 });
 ```
+
+### エラーを防ぐ方法2
+
+上記の方法では，プログラムの流れが直感的ではなく，違和感を覚えた方もいると思います．そこで，HTMLからJavaScriptのプログラムをロードする際に，以下のように書いておくとエラーが発生しません．
+
+該当する行しか書いていませんが，5章の冒頭に有るHTMLファイルの6行目を，以下のように変更してください．変更箇所は，ファイル名の後ろに```defer```と付けているところです．
+
+```html hl
+&lt;script src="keyboard.js" defer&gt;&lt;/script&gt;
+```
+
+このように記載すると，ロード後に即座に実行されずに，DOM構築が終わった後に実行されます．
+
+```mermaid
+graph TB
+    HTML --> JavaScript
+    JavaScript --> DOM構築 
+    DOM構築 --> defer付きscript
+    defer付きscript --> DOMContentLoaded
+    DOMContentLoaded --> 画像のロード 
+    画像のロード --> load
+```
+
 
 </jsn-md>
 </div>

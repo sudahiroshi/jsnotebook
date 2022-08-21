@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/styles/xcode.css">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
+    <script src="/js/mermaid.min.js" defer></script>
     <script src="./js/jsnotebook.js"></script>
 <body>
 <article>
@@ -28,10 +29,10 @@ WebAudioAPIの持つsin波を使って，様々な音を合成してみましょ
 // オシレータを3つ作ってドミソの和音を鳴らす
 
 window.AudioContext = window.webkitAudioContext || window.AudioContext;
-var audioCtx = new AudioContext();
-var osc1 = audioCtx.createOscillator();
-var osc2 = audioCtx.createOscillator();
-var osc3 = audioCtx.createOscillator();
+const audioCtx = new AudioContext();
+let osc1 = audioCtx.createOscillator();
+let osc2 = audioCtx.createOscillator();
+let osc3 = audioCtx.createOscillator();
 osc1.frequency.value = 440 * Math.pow( 2, -9/12 ); // ド：約261.6Hz
 osc2.frequency.value = 440 * Math.pow( 2, -5/12 ); // ミ：約329.6Hz
 osc3.frequency.value = 440 * Math.pow( 2, -2/12 ); // ソ：約392.0Hz
@@ -42,10 +43,10 @@ osc3.connect( audioCtx.destination );
 osc1.start();
 osc2.start();
 osc3.start();
-setTimeout( function(){
-osc1.stop();
-osc2.stop();
-osc3.stop();
+setTimeout( () => {
+  osc1.stop();
+  osc2.stop();
+  osc3.stop();
 }, 2000 );
 ```
 
@@ -78,6 +79,13 @@ console.log( osc3.frequency.value + "Hz" );
 ```
 
 続いてオシレータノードを出力先に接続します．
+
+```mermaid
+graph LR
+    osc1 -- connect --> destination
+    osc2 -- connect --> destination
+    osc3 -- connect --> destination
+```
 
 ```javascript runnable editable
 osc1.connect( audioCtx.destination );
@@ -112,34 +120,34 @@ osc3.stop();
 ```javascript runnable editable
 // 矩形波を合成する
 
-var audioCtx = new AudioContext();
-var number = 20; // 20個の周波数について計算する
-var osc = new Array( number ); // 20個分のオシレータノード
-var amp = new Array( number ); // 20個分のゲインノード
-for( var i=0; i< number; i++ ) { 
+const audioCtx = new AudioContext();
+let number = 20; // 20個の周波数について計算する
+let osc = new Array( number ); // 20個分のオシレータノード
+let amp = new Array( number ); // 20個分のゲインノード
+for( let i=0; i< number; i++ ) {
     osc[i] = audioCtx.createOscillator(); // オシレータノードの初期化
     amp[i] = audioCtx.createGain(); // ゲインノードの初期化
-    
+
     // オシレータノード20個　→　ゲインノード20個　→　出力先
     osc[i].connect( amp[i] );
     amp[i].connect( audioCtx.destination );
 }
 
 // 周波数と振幅を調整して矩形波にする
-for( var i=0; i< number; i++ ) { 
-    var j = i*2+1; // 周波数と振幅のためのパラメータ
+for( let i=0; i< number; i++ ) {
+    let j = i*2+1; // 周波数と振幅のためのパラメータ
     osc[i].frequency.value = 440 * j; // 周波数
     amp[i].gain.value = 1.0/j; // 振幅
 }
 
-for( var i=0; i< number; i++ ) {
+for( let i=0; i< number; i++ ) {
     osc[i].start();
-}    
+}
 
 setTimeout( function(){
-for( var i=0; i< number; i++ ) {
-    osc[i].stop();
-}   
+    for( let i=0; i< number; i++ ) {
+        osc[i].stop();
+    }
 }, 2000 );
 ```
 
@@ -159,10 +167,10 @@ var audioCtx = new AudioContext();
 var number = 20; // 20個の周波数について計算する
 var osc = new Array( number ); // 20個分のオシレータノード
 var amp = new Array( number ); // 20個分のゲインノード
-for( var i=0; i< number; i++ ) { 
+for( let i=0; i< number; i++ ) {
     osc[i] = audioCtx.createOscillator(); // オシレータノードの初期化
     amp[i] = audioCtx.createGain(); // ゲインノードの初期化
-    
+
     // オシレータノード20個　→　ゲインノード20個　→　出力先
     osc[i].connect( amp[i] );
     amp[i].connect( audioCtx.destination );
@@ -174,8 +182,8 @@ for( var i=0; i< number; i++ ) {
 ```javascript runnable editable
 // 周波数と振幅を調整して矩形波にする
 
-for( var i=0; i< number; i++ ) { 
-    var j = i*2+1; // 周波数と振幅のためのパラメータ
+for( let i=0; i< number; i++ ) {
+    let j = i*2+1; // 周波数と振幅のためのパラメータ
     osc[i].frequency.value = 440 * j; // 周波数
     amp[i].gain.value = 1.0/j; // 振幅
 }
@@ -183,12 +191,12 @@ for( var i=0; i< number; i++ ) {
 
 再生します．
 ```javascript runnable editable
-for( var i=0; i< number; i++ ) { osc[i].start(); }    
+for( let i=0; i< number; i++ ) { osc[i].start(); }
 ```
 
 止めます．
 ```javascritp runnable editable
-for( var i=0; i< number; i++ ) { osc[i].stop(); }   
+for( let i=0; i< number; i++ ) { osc[i].stop(); }
 ```
 </jsn-md>
 </div>
