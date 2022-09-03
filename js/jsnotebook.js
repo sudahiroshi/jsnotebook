@@ -43,6 +43,7 @@ var setRun = function( div, element )  {
 /*        if( output.className.indexOf( 'console' ) != -1 ) {
             script = script.replace( /console.log\(/g, "jnsPrint( output," );
         }*/
+        //console.debug( script );
         try {
             dummyEval( script );
         } catch (e) {
@@ -119,6 +120,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var pres = document.querySelectorAll( 'pre code.javascript' );
     console.log(pres);
     pres.forEach( function( value ) {
+        console.log(value);
         let code = value.textContent.replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>' ).replace( /&nbsp;/g, ' ' );
         value.innerHTML = code;
     });

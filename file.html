@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+    <meta charset='utf-8'>
+    <link rel="stylesheet" href="./css/jsnotebook.css">
+    <link rel="stylesheet" href="./css/styles/xcode.css">
+    <script src="./js/showdown.min.js"></script>
+    <script src="./js/highlight.pack.js"></script>
+    <script src="./js/jsnotebook.js"></script>
+<body>
+<article>
+<jsn-md>
+ファイルアップロード・ダウンロード
+===============
+
+## ファイルアップロード
+
+Webページ上で動作するプログラムを開発していると，ローカルに有るファイルをアップロードしたい場面があります．そこで，ローカルファイルをアップロードして，Webページ内のJavaScriptからファイル内のデータを取り扱う方法を説明します．まず，ファイルをアップロードするためのinput要素を記述します．
+
+```html hl
+<input type="file" id="file_form">
+```
+実際には，以下のように表示されます．
+
+<input type="file" id="file_form">
+
+続いて，以下のように要素を取得しておきます．
+
+```javascript runnable console editable
+// 要素の取得
+var element = document.querySelector( '#file_form' );
+console.log( element );
+```
+
+次に，ファイルがアップロードされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinputタグにファイルをドラッグ＆ドロップすると，その情報が表示されます．
+
+```javascript runnable console editable
+element.addEventListener('change', async (ev) => {
+    var file = element.files[0];
+//    console.log(file);
+    var reader = new FileReader();
+//    console.log(reader);
+    reader.addEventListener('load', () => {
+        console.log( reader.result );
+    })
+    reader.readAsText(file);
+})
+```
+
+```javascript runnable console editable
+element.addEventListener('change', async (ev) => {
+    var file = element.files[0];
+    var size = file.size;
+//    console.log(file);
+    var reader = new FileReader();
+    console.log("debug1");
+//    console.log(reader);
+    reader.addEventListener('load', () => {
+        console.log("debug2");
+        var raw_data = reader.result;
+        var data = new Uint8Array( size );
+        for( let i=0; i < raw_data.length; i++ ) {
+            data[i] = raw_data.charCodeAt(i);
+        }
+        console.debug( data );
+        console.log( "debug3" );
+    })
+    reader.readAsText(file);
+})
+```
+
+## バイナリファイルアップロード
+
+テキストファイルをアップロードできるようになったので，次はバイナリファイルをアップロードしてみたいと思います．
+テキストファイルとの違いですが，consoleに表示するだけでなく，配列に入れてみたいと思います．
+まずは以下のようにinput要素を作成します．
+
+```html hl
+<input type="file" id="binary">
+```
+実際には，以下のように表示されます．
+
+<input type="file" id="binary">
+
+続いて，以下のように要素を取得しておきます．
+
+```javascript runnable console editable
+// 要素の取得
+var element2 = document.querySelector( '#binary' );
+console.log( element2 );
+```
+
+次に，ファイルがアップロードされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinputタグにファイルをドラッグ＆ドロップすると，その情報が表示されます．
+
+```javascript runnable console editable
+element2.addEventListener('change', async (ev) => {
+    var file = element2.files[0];
+    var size = file.size;
+//    console.log(file);
+//    console.log(size);
+    var data = new Uint8Array( size );
+
+    var reader = new FileReader();
+//    console.log(reader);
+    reader.addEventListener('load', () => {
+        console.log("debug2");
+        var raw_data = reader.result;
+        for( let i=0; i < raw_data.length; i++ ) {
+            data[i] = raw_data.charCodeAt(i);
+        }
+//        console.log( "debug3" );
+    });
+    for( let i=0; i < 10; i++ ) {
+        console.log( data[i] );
+    }
+    reader.readAsText(file);
+})
+```
+
+```javascript runnable console editable
+element2.addEventListener('change', async (ev) => {
+    var file = element2.files[0];
+    var size = file.size;
+    //console.log(file);
+    //console.log(size);
+    //var data = new Uint8Array( size );
+
+    var reader = new FileReader();
+    console.log(reader);
+    reader.addEventListener('load', () => {
+        console.log("debug1");
+        var data = new Uint8Array( size );
+        var raw_data = reader.result;
+        console.log(raw_data);
+        console.log( raw_data.length );
+        for( let i=0; i < raw_data.length; i++ ) {
+            data[i] = raw_data.charCodeAt(i);
+        }
+        console.debug( data );
+    });
+})
+```
+### JavaScriptの実行時にエラーが発生！？
+
+上記をファイルにしたものを以下に示します．
+これまで特に説明してきませんでしたが，JavaScriptのプログラムはHTMLの中に記述することができます．
+
+```html hl
+&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Document&lt;/title&gt;
+  &lt;script&gt;
+    var element = document.getElementById( 'canvas1' );
+    var context = element.getContext( '2d' );
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;canvas id="canvas1" width="400" height="400"&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+```
+
+さて，Webブラウザで上記ファイルを読み込むと・・・エラーが発生します．何故かと言うと，このような書き方をすると，Webブラウザ内でCanvasなどの要素を配置する前にプログラムが実行されてしまい，「'canvas1'なんて無いよ！」とエラーになってしまいます．
+
+そこで，ちょっと面倒ですが以下のように記述します．
+
+```html hl
+&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title>Document&lt;/title&gt;
+  &lt;script&gt;
+    window.addEventListener("load", function() {
+      var element = document.getElementById( 'canvas1' );
+      var context = element.getContext( '2d' );
+    });
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;canvas id="canvas1" width="400" height="400"&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+```
+
+大きく違うのは7行目です．
+この行は，windowに対して，「このページに関する全ての準備が整ったら第2パラメータで与えられた関数を実行せよ」という意味を持ちます．
+
+## 直線の描画
+
+文法だけ見ていてもつまらないので，実際に描画してみましょう．Canvasに描画するメソッドを以下に示します．実行すると，プログラムの下にあるcanvas要素に直線が描かれます．
+
+|メソッド|意味|
+|:--|:--|
+|beginPath|描画開始|
+|moveTo|描画開始座標を設定|
+|lineTo|線を描画|
+|stroke|実際に描画|
+
+まずはcontextを作成します．
+```javascript runnable console editable
+// canvas要素の取得
+var element = document.getElementById( 'canvas1' );
+var context = element.getContext( '2d' );
+console.log( context );
+```
+その後，任意の描画を行います．座標を変更して，様々な線を描いてみてください．
+
+```javascript runnable editable
+// 直線の描画（上にある「canvas要素の取得」を実行してから，ここを実行してください）
+context.beginPath();
+context.moveTo( 0, 0 );
+context.lineTo( 400, 400 );
+context.stroke();
+```
+
+<canvas id="canvas1" width="400" height="400"></canvas>
+
+beginPath〜strokeまでの間に，多数の描画メソッドを入れることも可能です．
+```javascript runnable editable
+// 多数の直線の描画（上にある「canvas要素の取得」を実行してから，ここを実行してください）
+context.beginPath();
+for( var i=0; i<400; i+=4 ) {
+  context.moveTo( i, 0 );
+  context.lineTo( 400-i, 400 );
+}
+context.stroke();
+```
+
+## マウスクリックで描画してみよう
+
+次に，マウスでクリックした座標に点を描画してみましょう．クリックした座標を取得するためには，おなじみの```addEventListener```を使用して，概ね以下のように記述します．
+
+```javascript hl
+// canvas要素の取得
+var element = document.getElementById( 'canvas1' );
+var context = element.getContext( '2d' );
+      
+element.addEventListener( 'click', ev => {
+    // ここで描画する
+})
+```
+
+ここで，変数evに座標の情報が格納されています．なぜこんなにたくさんの変数が用意されているかというと，ページがスクロールされた際に，画面上の座標が欲しい場合や，ページ内の相対的な座標が欲しい場合など，プログラム中で必要とする値が様々であるためです．
+
+変数名 | 意味
+--|--
+clientX | ブラウザの描画領域の左上を原点としたX座標
+clientY | ブラウザの描画領域の左上を原点としたY座標
+pageX | ページ全体でのマウスのX座標
+pageY | ページ全体でのマウスのY座標
+screenX | ディスプレイの左上を原点としたX座標
+screenY | ディスプレイの左上を原点としたY座標
+offsetX | 要素の左上を原点としたX座標 （正式な規格ではない）
+offsetY | 要素の左上を原点としたY座標 （正式な規格ではない）
+layerX | offsetXの代わりに規格化しようとしたが頓挫
+layerY | offsetYの代わりに規格化しようとしたが頓挫
+
+結局のところ，要素内の相対的な座標を取得したい場合は以下のようにして計算することが，現実的な解です．getBoundingClientRectは，要素の座標を取得する関数です．
+
+```javascript hl
+// クリックされた座標の取得（上にある「canvas要素の取得」を実行してから，ここを実行してください）
+element.addEventListener( 'click', ev => {
+var rect = ev.target.getBoundingClientRect();
+var x = ev.clientX - rect.left;
+var y = ev.clientY - rect.top;
+　// ここで描画する
+})
+```
+
+それでは実際にマウスクリックによる描画を実現してみましょう．まずは要素を取得してcontextを作成します．続いて，canvasの下にあるプログラムを実行し，その後canvasをクリックしてみてください．
+
+```javascript runnable editable console
+// canvas要素の取得
+var element2 = document.getElementById( 'canvas2' );
+var context2 = element2.getContext( '2d' );
+console.log( context2 );
+```
+
+ <canvas id="canvas2" width="400" height="400"></canvas>
+
+
+```javascript runnable editable
+// マウスイベントの記述（上にある「canvas要素の取得」を実行してから，ここを実行してください）
+element2.addEventListener( 'click', ev => {
+var rect = ev.target.getBoundingClientRect();
+var x = ev.clientX - rect.left;
+var y = ev.clientY - rect.top;
+context2.beginPath();
+context2.moveTo( x, y );
+context2.lineTo( x+1, y+1 );
+context2.stroke();
+})
+```
+
+
+## クラス化
+
+さて，上記ソースはお世辞にも見やすいとは言えません．見やすくするためにやることは2つあります．
+
+1. JavaScriptをHTMLとは別ファイルにする
+2. プログラムの見通しを良くするためにクラス化する
+
+と言うことで，まずは1からやってみましょう．
+
+### まずはJSを別ファイルに
+
+HTMLファイルから外部JavaScriptを読み込むためには以下の6行目のように書きます．
+
+```html hl
+&lt;!DOCTYPE html&gt;
+&lt;html lang="ja"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Document&lt;/title&gt;
+  &ltscript src="test1.js"&gt&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;canvas id="canvas1" width="400" height="400"&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+```
+
+これにより，HTMLは文書構造のみを記述することができ，何が書かれているか分かりやすくなりました．
+このように，JavaScriptやCSSなどは外部ファイルとして書きましょう．
+
+### クラス化してみる
+
+次にプログラム本体に手を入れ，クラス化します．クラス名は```Drawing```にしておきます．メソッドはコンストラクタ（```constructor```），イベントの設定（```set_event```），点描画（```drawPoint```）の3つです．クラス化したことに伴い，このように処理を細分化することで，メンテナンスや再利用が容易になります．
+
+
+```javascript hl 
+class Drawing {
+    
+  // コンストラクタ（JavaScriptではconstructorという名前のメソッド）
+  constructor( element ) {
+    this.element = element;
+    this.context = element.getContext( '2d' );
+  }
+  
+  // イベントの設定
+  set_event() {
+    this.element.addEventListener( 'click', ev => {
+      var rect = ev.target.getBoundingClientRect();
+      var x = ev.clientX - rect.left;
+      var y = ev.clientY - rect.top;
+      this.drawPoint( x, y );
+    });
+  }
+  
+  // 点を描画する
+  drawPoint( x, y ) {
+    this.context.beginPath();
+    this.context.moveTo( x, y );
+    this.context.lineTo( x+1, y+1 );
+    this.context.stroke();
+  }
+  
+}
+
+window.addEventListener("load", () => {
+  var element = document.getElementById( 'canvas1' );
+  var draw = new Drawing( element );
+  draw.set_event();
+});
+```
+
+上記プログラムは，実際にファイルを作成して確かめてみてください．
+
+</jsn-md>
+</article>
+</body>
+
+</html>
