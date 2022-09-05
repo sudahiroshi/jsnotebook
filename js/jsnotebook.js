@@ -118,9 +118,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // &, >, <を置き換える
     var pres = document.querySelectorAll( 'pre code.javascript' );
-    console.log(pres);
+//    console.log(pres);
     pres.forEach( function( value ) {
-        console.log(value);
+//        console.log(value); // デバッグ用
         let code = value.textContent.replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>' ).replace( /&nbsp;/g, ' ' );
         value.innerHTML = code;
     });
