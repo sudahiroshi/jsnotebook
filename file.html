@@ -82,8 +82,6 @@ element.addEventListener('change', async (ev) => {
 
 <input type="file" id="binary">
 
-<p id="test2">foo</p>
-
 続いて，以下のように要素を取得しておきます．
 
 ```javascript runnable console editable
@@ -104,76 +102,21 @@ element2.addEventListener('change', async (ev) => {
     console.log("debug1");
 //    console.log(reader);
     reader.addEventListener('load', () => {
-      document.querySelector('#test2').innerText = "debug3";
-        console.log("debug2");
+//        console.log("debug2");
         var raw_data = reader.result;
         for( let i=0; i < raw_data.length; i++ ) {
             data[i] = raw_data.charCodeAt(i);
         }
-        console.debug( data );
+//        console.debug( data );
         for( let i=0; i < 10; i++ ) {
-          console.log( data[i] );
+          console.log( data[i].toString(16) );
       }
-        console.log( "debug3" );
+//        console.log( "debug3" );
     });
     reader.readAsText(file);
 });
 ```
 
-```javascript runnable console editable
-element2.addEventListener('change', async (ev) => {
-    var file = element2.files[0];
-    var size = file.size;
-//    console.log(file);
-//    console.log(size);
-    var data = new Uint8Array( size );
-
-    var reader = new FileReader();
-    console.log(reader);
-    document.querySelector('#test2').innerText = "debug2";
-    reader.addEventListener('load', () => {
-      document.querySelector('#test2').innerText = "debug3";
-        console.log("debug2");
-        console.debug("debug2");
-        var raw_data = reader.result;
-        for( let i=0; i < raw_data.length; i++ ) {
-            data[i] = raw_data.charCodeAt(i);
-        }
-//        console.log( "debug3" );
-document.querySelector('#test2').innerText = "debug3";
-    });
-    for( let i=0; i < 10; i++ ) {
-        console.log( data[i] );
-    }
-    console.log( data );
-})
-```
-
-
-
-```javascript runnable console editable
-element2.addEventListener('change', async (ev) => {
-    var file = element2.files[0];
-    var size = file.size;
-    //console.log(file);
-    //console.log(size);
-    //var data = new Uint8Array( size );
-
-    var reader = new FileReader();
-    console.log(reader);
-    reader.addEventListener('load', () => {
-        console.log("debug1");
-        var data = new Uint8Array( size );
-        var raw_data = reader.result;
-        console.log(raw_data);
-        console.log( raw_data.length );
-        for( let i=0; i < raw_data.length; i++ ) {
-            data[i] = raw_data.charCodeAt(i);
-        }
-        console.debug( data );
-    });
-})
-```
 ### JavaScriptの実行時にエラーが発生！？
 
 上記をファイルにしたものを以下に示します．
