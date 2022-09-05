@@ -93,29 +93,144 @@ console.log( element2 );
 次に，ファイルがアップロードされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinputタグにファイルをドラッグ＆ドロップすると，その情報が表示されます．
 
 ```javascript runnable console editable
+var data;
 element2.addEventListener('change', async (ev) => {
     var file = element2.files[0];
     var size = file.size;
 //    console.log(file);
-    var data = new Uint8Array( size );
+    data = new ArrayBuffer( size );
     var reader = new FileReader();
     console.log("debug1");
 //    console.log(reader);
     reader.addEventListener('load', () => {
 //        console.log("debug2");
         var raw_data = reader.result;
+        console.log( typeof raw_data );
+        var view = new Uint8Array(raw_data);
+        console.log( typeof view );
+        for( let i=0; i < raw_data.length; i++ ) {
+            data[i] = view[i];
+        }
+//        console.debug( data );
+        for( let i=0; i < 10; i++ ) {
+          console.log( view[i] );
+      }
+//        console.log( "debug3" );
+    });
+    reader.readAsArrayBuffer(file);
+});
+```
+
+## アップロードされたオーディオデータの情報を表示する
+
+バイナリファイルをアップロードできるようになったので，wavやmp3などのオーディオデータがアップロードされた際に，その情報を表示してみたいと思います．
+inputタグは特に変えなくてもよいのですが，受付できるファイルタイプ（MIMEタイプ）を指定できるので，ここではaudioデータを指定します．なお，MIMEタイプは，通常```audio/wav```や```audio/mpeg```のように指定しますが，inputタグの場合は/の左側だけ指定することができます．
+
+
+```html hl
+<input type="file" id="audio1" accept="audio/*">
+```
+
+実際には，以下のように表示されます．
+
+<input type="file" id="audio1" accept="audio/*">
+
+続いて，以下のように要素を取得しておきます．
+
+```javascript runnable console editable
+// 要素の取得
+var element3 = document.querySelector( '#audio1' );
+console.log( element3 );
+```
+
+次に，ファイルがアップロードされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinputタグにファイルをドラッグ＆ドロップすると，その情報が表示されます．
+
+```javascript runnable console editable
+var data;
+var audioCtx = new window.AudioContext || window.webktAudioContext();
+var source = audioCtx.createBufferSource();
+element3.addEventListener('change', async (ev) => {
+    var file = element3.files[0];
+    var size = file.size;
+//    console.log(file);
+    data = new Uint8Array( size );
+    var reader = new FileReader();
+    console.log("debug1");
+//    console.log(reader);
+    reader.addEventListener('load', () => {
+        console.log("debug2");
+        var raw_data = reader.result;
+        console.log( typeof raw_data );
+
         for( let i=0; i < raw_data.length; i++ ) {
             data[i] = raw_data.charCodeAt(i);
         }
+        console.log( typeof data );
+        audioCtx.decodeAudioData( reader.response )
+        .then( () => {
+          console.log("degug4");
+        });
 //        console.debug( data );
         for( let i=0; i < 10; i++ ) {
           console.log( data[i].toString(16) );
       }
 //        console.log( "debug3" );
     });
-    reader.readAsText(file);
+    reader.readAsDataURL(file);
 });
 ```
+
+```javascript runnable console editable
+var data;
+var audioCtx = new window.AudioContext || window.webktAudioContext();
+var source = audioCtx.createBufferSource();
+element3.addEventListener('change', async (ev) => {
+    var file = element3.files[0];
+    var size = file.size;
+//    console.log(file);
+    data = new Uint8Array( size );
+    var reader = new FileReader();
+    console.log("debug1");
+    console.log(reader);
+    reader.addEventListener('load', () => {
+      console.log("debug2");
+    });
+
+});
+```
+
+
+```javascript runnable console editable
+var data;
+var audioCtx = new window.AudioContext || window.webktAudioContext();
+var source = audioCtx.createBufferSource();
+element3.addEventListener('change', async (ev) => {
+    var file = element3.files[0];
+    var size = file.size;
+//    console.log(file);
+    data = new Uint8Array( size );
+    var reader = new FileReader();
+    console.log("debug1");
+//    console.log(reader);
+    reader.addEventListener('load', () => {
+        console.log("debug2");
+//        audioCtx.decodeAudioData( reader.result )
+//        .then( decoded => {
+//          source.buffer = decoded;
+//          source.connect( aucioCtx.destination );
+//          for( let i=0; i<10; i++ ) {
+//            console.log(dcoded[i]);
+//          }
+//        });
+
+//        console.debug( data );
+
+//        console.log( "debug3" );
+    });
+
+});
+```
+
 
 ### JavaScriptの実行時にエラーが発生！？
 
