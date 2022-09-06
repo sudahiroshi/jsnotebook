@@ -153,7 +153,7 @@ element3.addEventListener('change', async (ev) => {
     var file = element3.files[0];
     var size = file.size;
 //    console.log(file);
-    data = new Uint8Array( size );
+    data = new ArrayBuffer( size );
     var reader = new FileReader();
     console.log("debug1");
 //    console.log(reader);
@@ -162,21 +162,24 @@ element3.addEventListener('change', async (ev) => {
         var raw_data = reader.result;
         console.log( typeof raw_data );
 
-        for( let i=0; i < raw_data.length; i++ ) {
-            data[i] = raw_data.charCodeAt(i);
-        }
+        //for( let i=0; i < raw_data.length; i++ ) {
+        //    data[i] = raw_data.charCodeAt(i);
+        //}
         console.log( typeof data );
-        audioCtx.decodeAudioData( reader.response )
-        .then( () => {
+        audioCtx.decodeAudioData( reader.result )
+        .then( buffer => {
           console.log("degug4");
+          source.buffer = buffer;
+          source.connect( audioCtx.destination );
+          source.start();
         });
 //        console.debug( data );
-        for( let i=0; i < 10; i++ ) {
-          console.log( data[i].toString(16) );
-      }
+//        for( let i=0; i < 10; i++ ) {
+//          console.log( data[i].toString(16) );
+//      }
 //        console.log( "debug3" );
     });
-    reader.readAsDataURL(file);
+    reader.readAsArrayBuffer(file);
 });
 ```
 
