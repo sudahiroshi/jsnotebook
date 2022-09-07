@@ -32,47 +32,29 @@ var element = document.querySelector( '#file_form' );
 console.log( element );
 ```
 
-次に，ファイルがアップロードされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinputタグにファイルをドラッグ＆ドロップすると，その情報が表示されます．
+次に，上記input要素に対してファイルがドロップされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinput要素にファイルをドラッグ＆ドロップすると，その情報が表示されます．
+処理の流れとしては，(1) input要素にファイルがドロップされる　→　(2) ファイルを読み取る　→　(3) 予め書いておいたファイルの読み取りが終わった際の処理という順に実行されます．(3)の内部処理では，読み取ったファイルの内容はreader.resultに代入されています．下記サンプルでは，ファイルの内容を表示しています．
 
 ```javascript runnable console editable
+// (1) input要素にファイルがドロップされた場合の処理
 element.addEventListener('change', async (ev) => {
-    var file = element.files[0];
-//    console.log(file);
+    var file = element.files[0];  // input要素のfilesがファイル情報です．複数ファイルに対応するため，配列になっています．
     var reader = new FileReader();
-//    console.log(reader);
-    reader.addEventListener('load', () => {
-        console.log( reader.result );
-    })
-    reader.readAsText(file);
-})
-```
 
-```javascript runnable console editable
-element.addEventListener('change', async (ev) => {
-    var file = element.files[0];
-    var size = file.size;
-//    console.log(file);
-    var reader = new FileReader();
-    console.log("debug1");
-//    console.log(reader);
+    // (3) 下にある(2)の処理が終わった＝ファイルを読み取った後の処理．
     reader.addEventListener('load', () => {
-        console.log("debug2");
-        var raw_data = reader.result;
-        var data = new Uint8Array( size );
-        for( let i=0; i < raw_data.length; i++ ) {
-            data[i] = raw_data.charCodeAt(i);
-        }
-        console.debug( data );
-        console.log( "debug3" );
-    })
+        console.log( reader.result );  // 読み取ったファイルの内容を表示
+    });
+
+    // (2) 実際にフィアルを読み取る処理
     reader.readAsText(file);
-})
+});
 ```
 
 ## バイナリファイルアップロード
 
 テキストファイルをアップロードできるようになったので，次はバイナリファイルをアップロードしてみたいと思います．
-テキストファイルとの違いですが，consoleに表示するだけでなく，配列に入れてみたいと思います．
+テキストファイルと違いArrayBufferとして読み込むため，Viewを介してアクセスする必要があります．
 まずは以下のようにinput要素を作成します．
 
 ```html hl
@@ -90,35 +72,125 @@ var element2 = document.querySelector( '#binary' );
 console.log( element2 );
 ```
 
-次に，ファイルがアップロードされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinputタグにファイルをドラッグ＆ドロップすると，その情報が表示されます．
+次に，上記input要素に対してファイルがドロップされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinput要素にファイルをドラッグ＆ドロップすると，その情報が表示されます．
+処理の流れとしては，(1) input要素にファイルがドロップされる　→　(2) ファイルを読み取る　→　(3) 予め書いておいたファイルの読み取りが終わった際の処理という順に実行されます．(3)の内部処理では，読み取ったファイルの内容はreader.resultに代入されています．1番目のプログラムでは，テキストデータとして読み込んでいましたが，今回はArrayBufferとして読み込んでいます．ArrayBufferは，そのままでは利用できないため，Viewとして符号なし8bit整数（Unsigned Int 8bit）を指定します．下記サンプルでは，ファイルの先頭10バイトを表示しています．
 
 ```javascript runnable console editable
-var data;
+// 読み込んだデータを入れておく変数
+var data2;
+
+// (1) input要素にファイルがドロップされた場合の処理
 element2.addEventListener('change', async (ev) => {
-    var file = element2.files[0];
-    var size = file.size;
-//    console.log(file);
-    data = new ArrayBuffer( size );
+    var file = element2.files[0];  // input要素のfilesがファイル情報です．複数ファイルに対応するため，配列になっています．
     var reader = new FileReader();
-    console.log("debug1");
-//    console.log(reader);
+    var size = file.size; // ファイルサイズ
+    data = new ArrayBuffer( size );  // ArrayBufferの宣言
+
+    // (3) 下にある(2)の処理が終わった＝ファイルを読み取った後の処理．
     reader.addEventListener('load', () => {
-//        console.log("debug2");
-        var raw_data = reader.result;
-        console.log( typeof raw_data );
-        var view = new Uint8Array(raw_data);
-        console.log( typeof view );
-        for( let i=0; i < raw_data.length; i++ ) {
-            data[i] = view[i];
-        }
-//        console.debug( data );
+        data2 = reader.result;
+        let view = new Uint8Array( data2 );  // viewの指定
+
         for( let i=0; i < 10; i++ ) {
           console.log( view[i] );
       }
-//        console.log( "debug3" );
     });
+    // (2) 実際にフィアルを読み取る処理
     reader.readAsArrayBuffer(file);
 });
+```
+
+## アップロードされたオーディオデータを再生する＆グラフを描く
+
+バイナリファイルをアップロードできるようになったので，wavやmp3などのオーディオデータがアップロードされた後に，音声を再生したりグラフ描画を行いたいと思います．
+inputタグは特に変えなくてもよいのですが，受付できるファイルタイプ（MIMEタイプ）を指定できるので，ここではaudioデータを指定します．なお，MIMEタイプは，通常```audio/wav```や```audio/mpeg```のように指定しますが，inputタグの場合は/の左側だけ指定することができます．この指定は，「ファイルを選択」ボタンを押した際にオーディオデータのみ表示されるようになりますが，ドラッグ＆ドロップに対しては特に効果はありません．
+まずは以下のようにinput要素を作成します．また，音声データを再生するボタンを付けておきます．
+
+```html hl
+<input type="file" id="audio1" accept="audio/*">
+<button id="play1">再生する</button>
+<button id="draw1">描画する</button>
+<canvas width="512" height="300"></canvas>
+```
+実際には，以下のように表示されます．
+
+<input type="file" id="audio1" accept="audio/*">
+<button id="play1">再生する</button>
+<button id="draw1">描画する</button>
+<canvas width="512" height="300" id="graph1"></canvas>
+
+```javascript runnable console editable
+// 要素の取得
+var element3 = document.querySelector( '#audio1' );
+var play1 = document.querySelector( '#play1' );
+var draw1 = document.querySelector( '#draw1' );
+var graph1 = document.querySelector( '#graph1' );
+console.log( [element3, play1, draw1, graph1] );
+```
+
+バイナリファイルを読み込むところまでは，先の例と同じですが，今回は表示せずにdata3に代入するところまで行います．
+プログラムが細切れになりすぎているので，要素を取得する部分をまとめました．
+
+```javascript runnable console editable
+// 読み込んだデータを入れておく変数
+var data3;
+var buffer3;
+
+// (1) input要素にファイルがドロップされた場合の処理
+element3.addEventListener('change', async (ev) => {
+    var file = element3.files[0];  // input要素のfilesがファイル情報です．複数ファイルに対応するため，配列になっています．
+    var reader = new FileReader();
+    var size = file.size; // ファイルサイズ
+    data = new ArrayBuffer( size );  // ArrayBufferの宣言
+    console.log( "size=" + size );
+
+    // (3) 下にある(2)の処理が終わった＝ファイルを読み取った後の処理．
+    reader.addEventListener('load', () => {
+        data3 = reader.result;
+    });
+    // (2) 実際にフィアルを読み取る処理
+    reader.readAsArrayBuffer(file);
+});
+```
+
+続いて，「再生する」ボタンが押された際に，読み込んだファイルを音声に変換して再生する処理を記述します．特にチェックをしていないですが，ファイルを読み込んでからボタンをクリックするようにしてください．
+
+
+```javascript runnable editable
+// 再生するボタンがクリックされた際の処理
+play1.addEventListener('click', () => {
+  let audioCtx = new window.AudioContext || window.webktAudioContext();
+  let source = audioCtx.createBufferSource();
+
+  // decodeAudioDataで音声ファイルを音声データに変換します
+  audioCtx.decodeAudioData( data3 )
+  .then( buffer => {
+    buffer3 = buffer;
+    source.buffer = buffer;
+    source.connect( audioCtx.destination );
+    source.start();
+  });
+})
+```
+
+
+```javascript runnable console editable
+// 描画するボタンが押された際の処理
+draw1.addEventListener('click', () => {
+  let size = buffer3.length;
+  let wave = buffer3.getChannelData(0);
+  console.log( buffer3.getChannelData(0) );
+  let ctx = graph1.getContext('2d');
+  ctx.beginPath();
+  ctx.moveTo( 0, 128 );
+  let x = 0;
+  for( i=0; i < 65536*2; i+=2*65536/512 ) {
+    ctx.lineTo( x, 128-wave[i]*256 );
+    x+=1;
+  }
+  ctx.stroke();
+});
+
 ```
 
 ## アップロードされたオーディオデータの情報を表示する
