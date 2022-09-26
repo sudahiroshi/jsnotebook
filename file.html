@@ -193,349 +193,116 @@ draw1.addEventListener('click', () => {
 
 ```
 
-## アップロードされたオーディオデータの情報を表示する
+## アップロードされたオーディオデータをテキスト形式で取得する
 
-バイナリファイルをアップロードできるようになったので，wavやmp3などのオーディオデータがアップロードされた際に，その情報を表示してみたいと思います．
-inputタグは特に変えなくてもよいのですが，受付できるファイルタイプ（MIMEタイプ）を指定できるので，ここではaudioデータを指定します．なお，MIMEタイプは，通常```audio/wav```や```audio/mpeg```のように指定しますが，inputタグの場合は/の左側だけ指定することができます．
+wavやmp3などのオーディオファイルを読み込んで個々のデータを取得できるようになったので，次はそのデータをテキスト形式でダウンロードしてみましょう．
 
+まずは以下のようにinput要素を作成します．また，データ変換用のボタンや音声データをダウンロードするリンク（a要素）を設置するためのdiv要素を付けておきます．
 
 ```html hl
-<input type="file" id="audio1" accept="audio/*">
+<input type="file" id="audio2" accept="audio/*">
+<button id="convert1">オーディオデータをテキストに変換</button>
+<div id="links"></div>
 ```
 
-実際には，以下のように表示されます．
+実際には，以下のように表示されます．リンク用のdiv要素は表示されません．
 
-<input type="file" id="audio1" accept="audio/*">
+<input type="file" id="audio2" accept="audio/*">
+<button id="convert1">オーディオデータをテキストに変換</button>
+<div id="links"></div>
 
 続いて，以下のように要素を取得しておきます．
 
 ```javascript runnable console editable
 // 要素の取得
-var element3 = document.querySelector( '#audio1' );
-console.log( element3 );
+var element4 = document.querySelector( '#audio2' );
+var convert1 = document.querySelector( '#convert1' );
+//var links = document.querySelector( '#links' );
+console.log( [element4, convert1, links] );
 ```
 
-次に，ファイルがアップロードされたことを示す```change```イベントの処理を記載します．※以下のプログラムを実行しても，その時点では何も表示されません．上にあるinputタグにファイルをドラッグ＆ドロップすると，その情報が表示されます．
+バイナリファイルを読み込むところまでは，先の例と同じですが，今回は表示せずにdata4に代入するところまで行います．
 
 ```javascript runnable console editable
-var data;
-var audioCtx = new window.AudioContext || window.webktAudioContext();
-var source = audioCtx.createBufferSource();
-element3.addEventListener('change', async (ev) => {
-    var file = element3.files[0];
-    var size = file.size;
-//    console.log(file);
-    data = new ArrayBuffer( size );
-    var reader = new FileReader();
-    console.log("debug1");
-//    console.log(reader);
-    reader.addEventListener('load', () => {
-        console.log("debug2");
-        var raw_data = reader.result;
-        console.log( typeof raw_data );
+// 読み込んだデータを入れておく変数
+var data4;
 
-        //for( let i=0; i < raw_data.length; i++ ) {
-        //    data[i] = raw_data.charCodeAt(i);
-        //}
-        console.log( typeof data );
-        audioCtx.decodeAudioData( reader.result )
-        .then( buffer => {
-          console.log("degug4");
-          source.buffer = buffer;
-          source.connect( audioCtx.destination );
-          source.start();
-        });
-//        console.debug( data );
-//        for( let i=0; i < 10; i++ ) {
-//          console.log( data[i].toString(16) );
-//      }
-//        console.log( "debug3" );
+// (1) input要素にファイルがドロップされた場合の処理
+element4.addEventListener('change', async (ev) => {
+    var file = element4.files[0];  // input要素のfilesがファイル情報です．複数ファイルに対応するため，配列になっています．
+    var reader = new FileReader();
+    var size = file.size; // ファイルサイズ
+    data = new ArrayBuffer( size );  // ArrayBufferの宣言
+    console.log( "size=" + size );
+
+    // (3) 下にある(2)の処理が終わった＝ファイルを読み取った後の処理．
+    reader.addEventListener('load', () => {
+        data4 = reader.result;
     });
+    // (2) 実際にフィアルを読み取る処理
     reader.readAsArrayBuffer(file);
 });
 ```
 
-```javascript runnable console editable
-var data;
-var audioCtx = new window.AudioContext || window.webktAudioContext();
-var source = audioCtx.createBufferSource();
-element3.addEventListener('change', async (ev) => {
-    var file = element3.files[0];
-    var size = file.size;
-//    console.log(file);
-    data = new Uint8Array( size );
-    var reader = new FileReader();
-    console.log("debug1");
-    console.log(reader);
-    reader.addEventListener('load', () => {
-      console.log("debug2");
-    });
+続いて，「変換する」ボタンが押された際に，読み込んだファイルを変換してダウンロード用のリンクを生成する処理を記述します．特にチェックをしていないですが，ファイルを読み込んでからボタンをクリックするようにしてください．
 
-});
-```
-
-
-```javascript runnable console editable
-var data;
-var audioCtx = new window.AudioContext || window.webktAudioContext();
-var source = audioCtx.createBufferSource();
-element3.addEventListener('change', async (ev) => {
-    var file = element3.files[0];
-    var size = file.size;
-//    console.log(file);
-    data = new Uint8Array( size );
-    var reader = new FileReader();
-    console.log("debug1");
-//    console.log(reader);
-    reader.addEventListener('load', () => {
-        console.log("debug2");
-//        audioCtx.decodeAudioData( reader.result )
-//        .then( decoded => {
-//          source.buffer = decoded;
-//          source.connect( aucioCtx.destination );
-//          for( let i=0; i<10; i++ ) {
-//            console.log(dcoded[i]);
-//          }
-//        });
-
-//        console.debug( data );
-
-//        console.log( "debug3" );
-    });
-
-});
-```
-
-
-### JavaScriptの実行時にエラーが発生！？
-
-上記をファイルにしたものを以下に示します．
-これまで特に説明してきませんでしたが，JavaScriptのプログラムはHTMLの中に記述することができます．
-
-```html hl
-&lt;!DOCTYPE html&gt;
-&lt;html lang="ja"&gt;
-&lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;title&gt;Document&lt;/title&gt;
-  &lt;script&gt;
-    var element = document.getElementById( 'canvas1' );
-    var context = element.getContext( '2d' );
-  &lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;canvas id="canvas1" width="400" height="400"&gt;&lt;/canvas&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-```
-
-さて，Webブラウザで上記ファイルを読み込むと・・・エラーが発生します．何故かと言うと，このような書き方をすると，Webブラウザ内でCanvasなどの要素を配置する前にプログラムが実行されてしまい，「'canvas1'なんて無いよ！」とエラーになってしまいます．
-
-そこで，ちょっと面倒ですが以下のように記述します．
-
-```html hl
-&lt;!DOCTYPE html&gt;
-&lt;html lang="ja"&gt;
-&lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;title>Document&lt;/title&gt;
-  &lt;script&gt;
-    window.addEventListener("load", function() {
-      var element = document.getElementById( 'canvas1' );
-      var context = element.getContext( '2d' );
-    });
-  &lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;canvas id="canvas1" width="400" height="400"&gt;&lt;/canvas&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-```
-
-大きく違うのは7行目です．
-この行は，windowに対して，「このページに関する全ての準備が整ったら第2パラメータで与えられた関数を実行せよ」という意味を持ちます．
-
-## 直線の描画
-
-文法だけ見ていてもつまらないので，実際に描画してみましょう．Canvasに描画するメソッドを以下に示します．実行すると，プログラムの下にあるcanvas要素に直線が描かれます．
-
-|メソッド|意味|
-|:--|:--|
-|beginPath|描画開始|
-|moveTo|描画開始座標を設定|
-|lineTo|線を描画|
-|stroke|実際に描画|
-
-まずはcontextを作成します．
-```javascript runnable console editable
-// canvas要素の取得
-var element = document.getElementById( 'canvas1' );
-var context = element.getContext( '2d' );
-console.log( context );
-```
-その後，任意の描画を行います．座標を変更して，様々な線を描いてみてください．
-
-```javascript runnable editable
-// 直線の描画（上にある「canvas要素の取得」を実行してから，ここを実行してください）
-context.beginPath();
-context.moveTo( 0, 0 );
-context.lineTo( 400, 400 );
-context.stroke();
-```
-
-<canvas id="canvas1" width="400" height="400"></canvas>
-
-beginPath〜strokeまでの間に，多数の描画メソッドを入れることも可能です．
-```javascript runnable editable
-// 多数の直線の描画（上にある「canvas要素の取得」を実行してから，ここを実行してください）
-context.beginPath();
-for( var i=0; i<400; i+=4 ) {
-  context.moveTo( i, 0 );
-  context.lineTo( 400-i, 400 );
-}
-context.stroke();
-```
-
-## マウスクリックで描画してみよう
-
-次に，マウスでクリックした座標に点を描画してみましょう．クリックした座標を取得するためには，おなじみの```addEventListener```を使用して，概ね以下のように記述します．
-
-```javascript hl
-// canvas要素の取得
-var element = document.getElementById( 'canvas1' );
-var context = element.getContext( '2d' );
-      
-element.addEventListener( 'click', ev => {
-    // ここで描画する
-})
-```
-
-ここで，変数evに座標の情報が格納されています．なぜこんなにたくさんの変数が用意されているかというと，ページがスクロールされた際に，画面上の座標が欲しい場合や，ページ内の相対的な座標が欲しい場合など，プログラム中で必要とする値が様々であるためです．
-
-変数名 | 意味
---|--
-clientX | ブラウザの描画領域の左上を原点としたX座標
-clientY | ブラウザの描画領域の左上を原点としたY座標
-pageX | ページ全体でのマウスのX座標
-pageY | ページ全体でのマウスのY座標
-screenX | ディスプレイの左上を原点としたX座標
-screenY | ディスプレイの左上を原点としたY座標
-offsetX | 要素の左上を原点としたX座標 （正式な規格ではない）
-offsetY | 要素の左上を原点としたY座標 （正式な規格ではない）
-layerX | offsetXの代わりに規格化しようとしたが頓挫
-layerY | offsetYの代わりに規格化しようとしたが頓挫
-
-結局のところ，要素内の相対的な座標を取得したい場合は以下のようにして計算することが，現実的な解です．getBoundingClientRectは，要素の座標を取得する関数です．
-
-```javascript hl
-// クリックされた座標の取得（上にある「canvas要素の取得」を実行してから，ここを実行してください）
-element.addEventListener( 'click', ev => {
-var rect = ev.target.getBoundingClientRect();
-var x = ev.clientX - rect.left;
-var y = ev.clientY - rect.top;
-　// ここで描画する
-})
-```
-
-それでは実際にマウスクリックによる描画を実現してみましょう．まずは要素を取得してcontextを作成します．続いて，canvasの下にあるプログラムを実行し，その後canvasをクリックしてみてください．
 
 ```javascript runnable editable console
-// canvas要素の取得
-var element2 = document.getElementById( 'canvas2' );
-var context2 = element2.getContext( '2d' );
-console.log( context2 );
-```
+// 再生するボタンがクリックされた際の処理
+console.log(convert1);
+convert1.addEventListener('click', async () => {
+  let audioCtx = new window.AudioContext || window.webktAudioContext();
+  let source = audioCtx.createBufferSource();
 
- <canvas id="canvas2" width="400" height="400"></canvas>
-
-
-```javascript runnable editable
-// マウスイベントの記述（上にある「canvas要素の取得」を実行してから，ここを実行してください）
-element2.addEventListener( 'click', ev => {
-var rect = ev.target.getBoundingClientRect();
-var x = ev.clientX - rect.left;
-var y = ev.clientY - rect.top;
-context2.beginPath();
-context2.moveTo( x, y );
-context2.lineTo( x+1, y+1 );
-context2.stroke();
+  console.log( "257: " + data4);
+  // decodeAudioDataで音声ファイルを音声データに変換します
+  audioCtx.decodeAudioData( data4 )
+  .then( buffer => {
+    let output = '';
+    //console.log( "262: dummy");
+    //console.log( "262: " + buffer);
+    //console.log( "263: " + buffer.numberOfChannels );
+    for( let i=0; i < buffer.numberOfChannels; i++ ) {
+      //console.log(" 265: dummy");
+      let size = buffer.length;
+      let wave = buffer.getChannelData(i);
+      //console.log( "268: " + size);
+      for( data of wave ) {
+        output += data + '\n';
+      }
+      let blob = new Blob([output], {type:'text/csv'});
+      let link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'chan_' + i + '.csv';
+      link.text = 'チャンネル' + i;
+      //console.log( "277: " + link);
+      let links = document.querySelector('#links');
+      links.appendChild( link );
+      //console.log(links);
+    }
+  });
 })
 ```
 
 
-## クラス化
-
-さて，上記ソースはお世辞にも見やすいとは言えません．見やすくするためにやることは2つあります．
-
-1. JavaScriptをHTMLとは別ファイルにする
-2. プログラムの見通しを良くするためにクラス化する
-
-と言うことで，まずは1からやってみましょう．
-
-### まずはJSを別ファイルに
-
-HTMLファイルから外部JavaScriptを読み込むためには以下の6行目のように書きます．
-
-```html hl
-&lt;!DOCTYPE html&gt;
-&lt;html lang="ja"&gt;
-&lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;title&gt;Document&lt;/title&gt;
-  &ltscript src="test1.js"&gt&lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;canvas id="canvas1" width="400" height="400"&gt;&lt;/canvas&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-```
-
-これにより，HTMLは文書構造のみを記述することができ，何が書かれているか分かりやすくなりました．
-このように，JavaScriptやCSSなどは外部ファイルとして書きましょう．
-
-### クラス化してみる
-
-次にプログラム本体に手を入れ，クラス化します．クラス名は```Drawing```にしておきます．メソッドはコンストラクタ（```constructor```），イベントの設定（```set_event```），点描画（```drawPoint```）の3つです．クラス化したことに伴い，このように処理を細分化することで，メンテナンスや再利用が容易になります．
-
-
-```javascript hl 
-class Drawing {
-    
-  // コンストラクタ（JavaScriptではconstructorという名前のメソッド）
-  constructor( element ) {
-    this.element = element;
-    this.context = element.getContext( '2d' );
+```javascript runnable console editable
+// 描画するボタンが押された際の処理
+draw1.addEventListener('click', () => {
+  let size = buffer3.length;
+  let wave = buffer3.getChannelData(0);
+  console.log( buffer3.getChannelData(0) );
+  let ctx = graph1.getContext('2d');
+  ctx.beginPath();
+  ctx.moveTo( 0, 128 );
+  let x = 0;
+  for( i=0; i < 65536*2; i+=2*65536/512 ) {
+    ctx.lineTo( x, 128-wave[i]*256 );
+    x+=1;
   }
-  
-  // イベントの設定
-  set_event() {
-    this.element.addEventListener( 'click', ev => {
-      var rect = ev.target.getBoundingClientRect();
-      var x = ev.clientX - rect.left;
-      var y = ev.clientY - rect.top;
-      this.drawPoint( x, y );
-    });
-  }
-  
-  // 点を描画する
-  drawPoint( x, y ) {
-    this.context.beginPath();
-    this.context.moveTo( x, y );
-    this.context.lineTo( x+1, y+1 );
-    this.context.stroke();
-  }
-  
-}
-
-window.addEventListener("load", () => {
-  var element = document.getElementById( 'canvas1' );
-  var draw = new Drawing( element );
-  draw.set_event();
+  ctx.stroke();
 });
+
 ```
-
-上記プログラムは，実際にファイルを作成して確かめてみてください．
-
 </jsn-md>
 </article>
 </body>
