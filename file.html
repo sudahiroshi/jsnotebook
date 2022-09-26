@@ -213,24 +213,25 @@ wavやmp3などのオーディオファイルを読み込んで個々のデー�
 
 ```html hl
 <input type="file" id="audio2" accept="audio/*">
-<button id="convert1">オーディオデータをテキストに変換</button>
+<button id="convert1">オーディオデータをテキストに変換する</button>
 <div id="links"></div>
 ```
 
 実際には，以下のように表示されます．リンク用のdiv要素は表示されません．
+まずは，以下の3つのプログラムを実行して，オーディオデータをアップロードしてください．その後，変換するボタンをクリックすると，チャンネルごとにテキスト化されたデータをダウンロードすることができます．
+なお，ダウンロードするデータは，-1.0〜1.0の実数をテキスト化しているため，若干精度が悪いです．
 
 <input type="file" id="audio2" accept="audio/*">
-<button id="convert1">オーディオデータをテキストに変換</button>
+<button id="convert1">オーディオデータをテキストに変換する</button>
 <div id="links"></div>
 
-続いて，以下のように要素を取得しておきます．
+まずは要素を取得しておきます．
 
 ```javascript runnable console editable
 // 要素の取得
 var element4 = document.querySelector( '#audio2' );
 var convert1 = document.querySelector( '#convert1' );
-//var links = document.querySelector( '#links' );
-console.log( [element4, convert1, links] );
+console.log( [element4, convert1] );
 ```
 
 バイナリファイルを読み込むところまでは，先の例と同じですが，今回は表示せずにdata4に代入するところまで行います．
@@ -266,55 +267,31 @@ convert1.addEventListener('click', async () => {
   let audioCtx = new window.AudioContext || window.webktAudioContext();
   let source = audioCtx.createBufferSource();
 
-  console.log( "257: " + data4);
   // decodeAudioDataで音声ファイルを音声データに変換します
   audioCtx.decodeAudioData( data4 )
   .then( buffer => {
     let output = '';
-    //console.log( "262: dummy");
-    //console.log( "262: " + buffer);
-    //console.log( "263: " + buffer.numberOfChannels );
+    // チャンネル数分のデータとダウンロード用のリンクを作成します．
     for( let i=0; i < buffer.numberOfChannels; i++ ) {
-      //console.log(" 265: dummy");
       let size = buffer.length;
       let wave = buffer.getChannelData(i);
-      //console.log( "268: " + size);
+      // データ数の分だけ繰り返してテキスト化します．
       for( data of wave ) {
         output += data + '\n';
       }
+      // Blob型のデータを作ります．内容は変数outputで，CSV形式とします．
       let blob = new Blob([output], {type:'text/csv'});
       let link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = 'chan_' + i + '.csv';
       link.text = 'チャンネル' + i;
-      //console.log( "277: " + link);
       let links = document.querySelector('#links');
       links.appendChild( link );
-      //console.log(links);
     }
   });
 })
 ```
 
-
-```javascript runnable console editable
-// 描画するボタンが押された際の処理
-draw1.addEventListener('click', () => {
-  let size = buffer3.length;
-  let wave = buffer3.getChannelData(0);
-  console.log( buffer3.getChannelData(0) );
-  let ctx = graph1.getContext('2d');
-  ctx.beginPath();
-  ctx.moveTo( 0, 128 );
-  let x = 0;
-  for( i=0; i < 65536*2; i+=2*65536/512 ) {
-    ctx.lineTo( x, 128-wave[i]*256 );
-    x+=1;
-  }
-  ctx.stroke();
-});
-
-```
 </jsn-md>
 </article>
 </body>
