@@ -104,7 +104,7 @@ element2.addEventListener('change', async (ev) => {
 
 バイナリファイルをアップロードできるようになったので，wavやmp3などのオーディオデータがアップロードされた後に，音声を再生したりグラフ描画を行いたいと思います．
 inputタグは特に変えなくてもよいのですが，受付できるファイルタイプ（MIMEタイプ）を指定できるので，ここではaudioデータを指定します．なお，MIMEタイプは，通常```audio/wav```や```audio/mpeg```のように指定しますが，inputタグの場合は/の左側だけ指定することができます．この指定は，「ファイルを選択」ボタンを押した際にオーディオデータのみ表示されるようになりますが，ドラッグ＆ドロップに対しては特に効果はありません．
-まずは以下のようにinput要素を作成します．また，音声データを再生するボタンを付けておきます．
+まずは以下のようにinput要素を作成します．また，音声データを再生するボタン，および，グラフ描画するボタンを付けておきます．
 
 ```html hl
 <input type="file" id="audio1" accept="audio/*">
@@ -112,7 +112,7 @@ inputタグは特に変えなくてもよいのですが，受付できるファ
 <button id="draw1">描画する</button>
 <canvas width="512" height="300"></canvas>
 ```
-実際には，以下のように表示されます．
+実際には，以下のように表示されます．下の方に有る4つのプログラムすべてを「Run」してから，上のinput要素に音声データをドロップしてください．
 
 <input type="file" id="audio1" accept="audio/*">
 <button id="play1">再生する</button>
@@ -129,24 +129,22 @@ console.log( [element3, play1, draw1, graph1] );
 ```
 
 バイナリファイルを読み込むところまでは，先の例と同じですが，今回は表示せずにdata3に代入するところまで行います．
-プログラムが細切れになりすぎているので，要素を取得する部分をまとめました．
 
 ```javascript runnable console editable
 // 読み込んだデータを入れておく変数
-var data3;
-var buffer3;
+var data3;  // ArrayBuffer型
+var buffer3;  // AudioBuffer型
 
 // (1) input要素にファイルがドロップされた場合の処理
 element3.addEventListener('change', async (ev) => {
     var file = element3.files[0];  // input要素のfilesがファイル情報です．複数ファイルに対応するため，配列になっています．
     var reader = new FileReader();
     var size = file.size; // ファイルサイズ
-    data = new ArrayBuffer( size );  // ArrayBufferの宣言
     console.log( "size=" + size );
 
     // (3) 下にある(2)の処理が終わった＝ファイルを読み取った後の処理．
     reader.addEventListener('load', () => {
-        data3 = reader.result;
+        data3 = reader.result;  // data3の型はArrayBufferです
     });
     // (2) 実際にフィアルを読み取る処理
     reader.readAsArrayBuffer(file);
@@ -165,7 +163,9 @@ play1.addEventListener('click', () => {
   // decodeAudioDataで音声ファイルを音声データに変換します
   audioCtx.decodeAudioData( data3 )
   .then( buffer => {
-    buffer3 = buffer;
+    buffer3 = buffer;  // buffer3の型はAudioBufferです
+
+    // 以下は音声を再生する処理です．再生する必要がなければ不要です．
     source.buffer = buffer;
     source.connect( audioCtx.destination );
     source.start();
@@ -173,13 +173,25 @@ play1.addEventListener('click', () => {
 })
 ```
 
+ここまでの処理で，buffer3に音声データが代入されました．buffer3はAudioBuffer型なので，内部的に以下の情報を持ちます．
+
+変数名 | 内容
+--|--
+sampleRate | サンプリングレート（1秒あたりのサンプル数）
+length | データ数
+duration | 音声データの秒数
+numberOfChannels | チャンネル数
 
 ```javascript runnable console editable
 // 描画するボタンが押された際の処理
 draw1.addEventListener('click', () => {
+  console.log( "データ数 = " + buffer3.length );
+  console.log( "サンプリングレート = " + buffer3.sampleRate + "Hz" );
+  console.log( "秒数 = " + buffer3.duration + " 秒" );
+  console.log( "チャンネル数 = " + buffer3.numberOfChannels );
   let size = buffer3.length;
-  let wave = buffer3.getChannelData(0);
-  console.log( buffer3.getChannelData(0) );
+  let wave = buffer3.getChannelData(0);  // 最初のチャンネルのデータを取得
+
   let ctx = graph1.getContext('2d');
   ctx.beginPath();
   ctx.moveTo( 0, 128 );
