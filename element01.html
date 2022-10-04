@@ -100,7 +100,7 @@ console.log( inputElm.length + "個の要素を取得しました" );
 
 しかし，ページ内に存在する他のinputタグも一緒に抽出されてしまっています．そこで，以下のようにして一つ一つの内容を見て，```type=="radio"```の項目を抽出します．ちょっと面倒ですね．
 
-```javascirpt runnable editable console
+```javascript runnable editable console
 // inputElmの中からtypeがradioのものを抽出します
 
 var radios0 = [];
@@ -121,7 +121,7 @@ console.log( "最初の要素のvalueは" + radios0[0].value + "です" );
 
 通常，inputタグのnameの内容は他の箇所と別の名称にします．そこで，この情報を使用して要素群を取得する事もできます．
 
-```javascirpt runnable editable console
+```javascript runnable editable console
 // nameがinput02の要素を全て取得します
 
 var radios1 = document.getElementsByName( 'radio02' );
@@ -138,7 +138,7 @@ querySelectorAllを使用したサンプルを以下に示します．パラメ�
 なお，コメントアウトしている行は，タグ名がinputで，さらに大カッコを使いnameがradio02の要素のみを抽出しています．コメントの位置を変更して，どちらでも要素軍が取得できていることをご確認ください．
 
 
-```javarscript runnable editable console
+```javascript runnable editable console
 // inputタグでtypeがradioのものを抽出します
 
 var radios2 = document.querySelectorAll( 'input[type="radio"]' );
@@ -153,7 +153,7 @@ console.log( "最初の要素のvalueは" + radios2[0].value + "です" );
 
 ### ID付きformで囲まれている場合（querySelector未使用）
 
-```javascirpt runnable editable console
+```javascript runnable editable console
 // IDからform要素を取得→input要素群を取得→checkedを探す
 // form内に外のinput要素が存在する場合はinput要素群を取得した後にtypeがradioの要素のみを抽出する必要あり
 
@@ -172,7 +172,7 @@ console.log( target.value );
 
 querySelectorを使用すると，以下のように書くことができます．今回はRadioボタン群から抽出したのでcheckedは1つしか存在しないという想定のものです．
 
-```javarscript runnable editable console
+```javascript runnable editable console
 // idがinput02-formの要素を取得→inputタグtypeがradioでcheckedの付いている要素を抽出
 
 var inputform = document.getElementById('input02-form');
@@ -182,7 +182,7 @@ console.log( radios3.value );
 
 ### classで指定する場合（querySelector未使用）
 
-```javascirpt runnable editable console
+```javascript runnable editable console
 // classがinput02の要素を取得→checkedを探す
 
 var inputs = document.getElementsByClassName( 'input02' );
@@ -197,7 +197,7 @@ console.log( target.value );
 
 ### classで指定する場合（querySelector使用）
 
-```javascirpt runnable editable console
+```javascript runnable editable console
 // classがinput02の要素の内checkedを抽出
 
 var target = document.querySelector( '.input02:checked' );
@@ -206,7 +206,7 @@ console.log( target.value );
 
 ### nameで指定する場合（querySelector未使用）
 
-```javascirpt runnable editable console
+```javascript runnable editable console
 // nameがradio02の要素を取得→checkedを探す
 
 var inputs = document.getElementsByName( 'radio02' );
@@ -221,7 +221,7 @@ console.log( target.value );
 
 ### nameで指定する場合（querySelector使用）
 
-```javascirpt runnable editable console
+```javascript runnable editable console
 // nameがradio02の要素の内checkedを抽出
 
 var target = document.querySelector( '[name="radio02"]:checked' );

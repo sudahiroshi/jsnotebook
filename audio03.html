@@ -31,7 +31,7 @@ var audioCtx = new AudioContext();
 
 描画する要素を変数g1とg2にセットします．描画領域は，このページの一番下にあります．
 
-```javascirpt once editable
+```javascript once editable
 // 描画のための準備
 var g1 = document.getElementById( "time1" ).getContext( "2d" );
 var g2 = document.getElementById( "freq1" ).getContext( "2d" );
@@ -88,7 +88,7 @@ osc3.start();
 ```
 
 音が出ている状態で以下のプログラムを実行すると，グラフが描画されます．この部分は何度でも実行可能です．
-```javascirpt runnable editable
+```javascript runnable editable
 // 時間領域のグラフを描画します．
 let timeData = new Uint8Array( 1024 );
 

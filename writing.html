@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="./css/styles/xcode.css">
     <script src="./js/showdown.min.js"></script>
     <script src="./js/highlight.pack.js"></script>
+    <script src="/js/mermaid.min.js" defer></script>
     <script src="./js/jsnotebook.js"></script>
 <body>
 <article>
@@ -33,6 +34,7 @@ Markdownに慣れるまでは，Markdownに対応したエディタを利用す�
 
 ## プログラムの記述と実行
 
+HTMLファイル内に```jsn-md```タグを配置し，その中にプログラムなどを記載できます．```jsn-md```はJSNotebook MarkDownの略です．
 ソースコードは，Markdownの流儀に従い，開始と終了の行にバッククオートを3個並べます．バッククオートを表示する方法が分からないので，書式についてはソースコードを見てください．バッククオートに続いてタグとして```javascript```と入力しておくと，プログラムと認識してくれます．（なぜか先頭行だけ1文字空いてしまいます．原因は調査中です．1行目はコメント専用としておくことで回避しても良いかな・・・と思っています）
 
 また，```javascript```に続くタグとして，```runnable```，```once```，```sandbox```を指定可能です．それぞれ，「通常の実行（別の枠まで変数を持ち越す）」「一度だけ実行可能（別の枠まで変数を持ち越す）」「sandbox内で実行」を意味します．それ以外に，```console```タグを付けておくと，実行ボタンの下にコンソールが付きます．
@@ -48,8 +50,8 @@ console.log( "x1は" + x1 + "です" );
 
 ```javascript runnable editable console
 // 編集可能です
-var x1 = 20;
-console.log( "x2は" + x1 + "です" );
+var x2 = 20;
+console.log( "x2は" + x2 + "です" );
 ```
 
 実行しないくて良いプログラムには，```hl```タグを付けることでSyntax Highliteを付けることも可能です．残念ながら，```hl```と```runnable```の共存はできません．
@@ -97,6 +99,41 @@ once | 1度だけ実行可能
 sandbox | 外に副作用を出さずに実行可能
 editable | 編集可能
 console | コンソールを表示
+
+## 図形の描画について
+
+簡単な図形を掲載するために，Mermaid記法を利用できるようにしています．
+バッククオート3つによるブロックに```mermaid```というタグを付けておいてください．
+以下に例を示します．例によってバッククオートを表記する方法が不明のため，ソースコードを参照してください．
+
+```mermaid
+graph LR
+    Markdow -- showdown.js --> HTML
+    Mermaid -- mermaid.js --> diagram
+```
+
+
+## 利用しているライブラリ
+
+JSNotebookでは，以下のライブラリを利用しています．なお，CDNなどを使用せずに，サイト内にファイルを置いています．
+
+名称 | 機能
+--|--
+[highlight.js](https://highlightjs.org/) | シンタックスハイライタ
+[showdown.js](https://showdownjs.com/) | Markdown to HTMLコンバータ
+[mermaid.js](https://mermaid-js.github.io/mermaid/#/) | 図表レンダラ
+
+## 現在分かっているバグ
+
+現在，以下のバグの存在を認識しています．
+1. JavaScriptのコード内で < の後ろにスペースがないとタグとみなされて，それ以降のレンダリングがおかしくなる
+1. プログラムブロックの先頭の行頭にスペースが挿入される
+1. editable領域で編集してしまうとconsoleに表示されなくなる
+
+## リポジトリ
+
+以下のリポジトリで管理しています．
+[JSNotebook](https://github.com/sudahiroshi/jsnotebook)
 
 </jsn-md>
 </article>
