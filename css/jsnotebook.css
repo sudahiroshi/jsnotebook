@@ -8,7 +8,7 @@ th {
     border: 1px solid #DDD;
     vertical-align: middle;
     text-align: center;
-    fon-weight: bold;
+    font-weight: bold;
 }
 td {
     padding: 0 10px;
@@ -41,6 +41,11 @@ pre>pre {
     border: 1px solid #ccc;
 }
 
+.output {
+    border:#5c9ee7;
+    width: 100%;
+    background-color:#ccc;
+}
 article {
     margin: 2em;
 }

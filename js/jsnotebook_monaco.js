@@ -1,13 +1,16 @@
-make_button = ( btn_text, element, console_number, check_console, settlement ) => {
+make_button = ( btn_text, element, console_number, check_console, settlement, editor ) => {
     let btn = document.createElement('button');
     btn.textContent = btn_text;
     let parent = element.parentNode;
     // ボタンの位置調整のためだけのp要素
-    parent.appendChild( document.createElement('p') );
-    parent.appendChild( btn );
+    //parent.appendChild( document.createElement('p') );
+    //parent.appendChild( btn );
+    parent.insertBefore( btn, element );
 
     btn.addEventListener('click', () => {
-        let program = element.innerHTML;
+        //let program = element.innerHTML;
+        let program = editor.getValue();
+        console.log( {program, console_number} );
 
         program = program
         .replace( /&nbsp;/g," ")
@@ -32,11 +35,12 @@ make_button = ( btn_text, element, console_number, check_console, settlement ) =
 }
 
 class Executable {
-    constructor( element ) {
+    constructor( element, editor ) {
         this.element = element;
         output ||= [];
         output_number ||= 0;
         this.console_number = false;
+        this.editor = editor;
     }
 
     check_console() {
@@ -47,35 +51,20 @@ class Executable {
         this.console_number = output_number;
         let parent = this.element.parentNode;
         let con = document.createElement( 'pre' );
-        con.classList.add( 'console' );
-        parent.appendChild( con );
+        con.classList.add( 'output' );
+        parent.insertBefore( con, this.element.nextSibling );
         output.push( con );
         output_number += 1;
     }
 }
 class Runnable extends Executable{
     add_button() {
-        // let btn = document.createElement('button');
-        // btn.textContent = "Run";
-        // let parent = this.element.parentNode;
-        // parent.appendChild( document.createElement('p') );
-        // parent.appendChild( btn );
-        //parent.appendChild( document.createElement('p').appendChild(btn) )
-
-        make_button( "Run", this.element, this.console_number, this.check_console(), false );
-
+        make_button( "Run", this.element, this.console_number, this.check_console(), false, this.editor );
     }
 }
 class Once extends Executable{
     add_button(){
-        // let btn = document.createElement('button');
-        // btn.textContent = "Once";
-        // let parent = this.element.parentNode;
-        // parent.appendChild( document.createElement('p') );
-        // parent.appendChild( btn );
-        //parent.appendChild( document.createElement('p').appendChild(btn) )
-
-        make_button( "Once", this.element, this.console_number, this.check_console(), true );
+        make_button( "Once", this.element, this.console_number, this.check_console(), true, this.editor );
     }
 }
 class Sandbox extends Executable {
@@ -115,11 +104,11 @@ class JSNotebook {
         let pre_tags = this.markdown.querySelectorAll('pre code.javascript');
         //console.log(pre_tags);
         require.config({ paths: { vs: "./node_modules/monaco-editor/min/vs" } });
-        require(["vs/editor/editor.main"], function () {
+        require(["vs/editor/editor.main"], () => {
             let editor;
             //console.log(pre_tags);
             pre_tags.forEach( elm => {
-                console.log(elm);
+                //console.log(elm);
                 elm.textContent = elm.textContent
                 .replace( /&nbsp;/g," ")
                 .replace( /&lt;/g, "<" )
@@ -135,31 +124,47 @@ class JSNotebook {
                         theme: 'vs-light',
                     }
                 );
-                    elm.remove();
+                elm.parentNode.classList.add(...elm.classList);
+                if( elm.classList.contains("runnable") ) {
+                    let runnable = new Runnable( elm.parentNode, editor );
+                    this.executable.push( runnable );
+                    if( elm.classList.contains("console") ) {
+                        runnable.add_console();
+                    }
+                    runnable.add_button();
+                }
+                if( elm.classList.contains("once") ) {
+                    let once = new Once( elm.parentNode, editor );
+                    this.executable.push( once );
+                    if( elm.classList.contains("console") ) {
+                        once.add_console();
+                    }
+                    once.add_button();
+                }
+                if( elm.classList.contains("sandbox") ) {
+                    let sandbox = new Sandbox( elm.parentNode, editor );
+                    this.executable.push( sandbox );
+                    if( elm.classList.contains("console") ) {
+                        sandbox.add_console();
+                    }
+                    sandbox.add_button();
+                }
+                elm.remove();
             });
 
             // if( elm.className.indexOf( 'runnable') != -1 )   this.executable.push( new Runnable( elm ) );
             // else if( elm.className.indexOf( 'once') != -1 )   this.executable.push( new Once( elm ) );
             // else if( elm.className.indexOf( 'sandbox') != -1 )   this.executable.push( new Sandbox( elm ) );
          });
-        //console.log(this.executable);
 
-        this.executable.forEach( elm => {
-            //console.log( elm.check_console() );
-            if( elm.check_console() )   elm.add_console();
-            elm.add_button();
-            //console.log( elm );
-        })
     }
 }
 const jsnPrint = ( element, string ) => {
-	if( element.className.indexOf( 'console' ) != -1 ) {
-		 element.innerHTML += string + "<br>";
-	}
+	element.innerHTML += string + "<br>";
 }
 
 const jsnError = ( element, string ) => {
-    if( element.className.indexOf( 'console' ) != -1 ) {
+    if( element.className.indexOf( 'output' ) != -1 ) {
     	element.innerHTML += "<span class='err'>" + string + "</span><br>";
     }
 }
