@@ -33,7 +33,7 @@
 ```javascript runnable editable
 // テキストノードを作成し，base01に追加する
 
-var destination = document.getElementById( 'base01' ); // 追加する先の要素を取得
+var destination = document.querySelector( '#base01' ); // 追加する先の要素を取得
 var textNode = document.createTextNode( "追加する文字列" ); // 追加する文字列
 destination.appendChild( textNode ); // 追加します
 ```
@@ -45,7 +45,7 @@ destination.appendChild( textNode ); // 追加します
 ```javascript runnable editable console
 // 改行を含む文字列をbase01に追加する
 
-var destination = document.getElementById( 'base01' );
+var destination = document.querySelector( '#base01' );
 
 var textNode1 = document.createTextNode( "改行前の文字列" );
 destination.appendChild( textNode1 );
@@ -66,7 +66,7 @@ console.log( br );
 ```javascript runnable editable console
 // 改行を含む文字列をbase01に追加する
 
-var destination = document.getElementById( 'base01' );
+var destination = document.querySelector( '#base01' );
 
 for( var elm of destination.childNodes ) {
   console.log( elm.data );
@@ -90,7 +90,7 @@ for( var elm of destination.childNodes ) {
 HTMLのリンクを表すタグはaで，以下の例のようにリンク先やリンクテキストも与える必要があります．
 
 ```html hl
-&lt;a href="http://www.google.co.jp/"&gt;グーグルへのリンク&lt;/a&gt;
+&lt;a href="https://www.google.co.jp/"&gt;グーグルへのリンク&lt;/a&gt;
 ```
 
 まずはaタグを追加してみましょう．まだ上の囲みには目に見える変化はありません．
@@ -98,7 +98,7 @@ HTMLのリンクを表すタグはaで，以下の例のようにリンク先や
 ```javascript runnable editable
 // リンクをbase02に追加する
 
-var destination = document.getElementById( 'base02' );
+var destination = document.querySelector( '#base02' );
 
 var link = document.createElement( "a" ); // リンク要素を作って
 destination.appendChild( link ); // 追加します
@@ -118,7 +118,7 @@ link.appendChild( linkText ); // 追加します
 ```javascript runnable editable
 // リンクテキストを追加する
 
-link.href = "http://www.google.co.jp/";
+link.href = "https://www.google.co.jp/";
 ```
 
 ## アトリビュート

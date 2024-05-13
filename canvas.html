@@ -24,7 +24,7 @@ CanvasAPIの使い方
 
 ```javascript sandbox console editable
 // canvas要素の取得
-var element = document.getElementById( 'canvas1' );
+var element = document.querySelector( '#canvas1' );
 var context = element.getContext( '2d' );
 console.log( context );
 ```
@@ -43,7 +43,7 @@ console.log( context );
   &lt;meta charset="UTF-8"&gt;
   &lt;title&gt;Document&lt;/title&gt;
   &lt;script&gt;
-    var element = document.getElementById( 'canvas1' );
+    var element = document.querySelector( '#canvas1' );
     var context = element.getContext( '2d' );
   &lt;/script&gt;
 &lt;/head&gt;
@@ -65,7 +65,7 @@ console.log( context );
   &lt;title>Document&lt;/title&gt;
   &lt;script&gt;
     window.addEventListener("load", function() {
-      var element = document.getElementById( 'canvas1' );
+      var element = document.querySelector( '#canvas1' );
       var context = element.getContext( '2d' );
     });
   &lt;/script&gt;
@@ -93,7 +93,7 @@ console.log( context );
 まずはcontextを作成します．
 ```javascript runnable console editable
 // canvas要素の取得
-var element = document.getElementById( 'canvas1' );
+var element = document.querySelector( '#canvas1' );
 var context = element.getContext( '2d' );
 console.log( context );
 ```
@@ -126,7 +126,7 @@ context.stroke();
 
 ```javascript hl
 // canvas要素の取得
-var element = document.getElementById( 'canvas1' );
+var element = document.querySelector( '#canvas1' );
 var context = element.getContext( '2d' );
       
 element.addEventListener( 'click', ev => {
@@ -165,7 +165,7 @@ var y = ev.clientY - rect.top;
 
 ```javascript runnable editable console
 // canvas要素の取得
-var element2 = document.getElementById( 'canvas2' );
+var element2 = document.querySelector( '#canvas2' );
 var context2 = element2.getContext( '2d' );
 console.log( context2 );
 ```
@@ -252,7 +252,7 @@ class Drawing {
 }
 
 window.addEventListener("load", () => {
-  var element = document.getElementById( 'canvas1' );
+  var element = document.querySelector( '#canvas1' );
   var draw = new Drawing( element );
   draw.set_event();
 });

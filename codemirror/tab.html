@@ -1,0 +1,80 @@
+
+<!doctype html>
+<html lang=en-US>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>CodeMirror Language Config Example</title>
+<link rel=stylesheet href=./css/site.css>
+<link rel=icon href=./../../style/logo.svg>
+
+<header>
+  <nav>
+    <a class=logo href="./../../">CodeMirror</a>
+    <div class=navlinks>
+      <a href="./../../examples/" class=active>Examples</a>
+      <a href="./../../docs/" >Documentation</a>
+      <a href="./../../try/" >Try</a>
+      <a href="https://discuss.codemirror.net/">Discuss</a>
+      <a href="https://github.com/codemirror/dev/">GitHub</a>
+      <a href="https://codemirror.net/5/">Version 5</a>
+    </div>
+  </nav>
+</header><article><h1 id="example%3A-tab-handling" tabindex="-1">Example: Tab Handling</h1>
+<p>By default, CodeMirror <em>does not</em> handle the Tab key. This isn't an
+oversight—it is an intentional decision to make the default
+configuration pass the <a href="https://www.w3.org/TR/WCAG21/#no-keyboard-trap">&quot;no keyboard
+trap&quot;</a> criterion of
+the W3C Web Content Accessibility Guidelines.</p>
+<p>Some users browse the web without access to a pointing device, and it
+is really unfriendly towards such users to have focusable inputs that
+they cannot escape from.</p>
+<p><em>However</em>, I understand that people expect the Tab key do something
+indentation-related in code editor controls. To that purpose,
+CodeMirror has a built-in escape hatch: If you press the Escape key,
+and then press Tab directly after it, the editor never handles the Tab
+press, so that you can use that to move focus. Unfortunately, since
+CodeMirror doesn't have a built-in help feature (and probably
+shouldn't, since it's just a component, not an application), users
+won't know this.</p>
+<p>So if you <em>really</em> want to bind Tab, please start by making sure you
+mention this escape hatch somewhere in your documentation. Next, you
+can <a href="./../../docs/ref/#view.keymap">add</a> your own <a href="./../../docs/ref/#view.KeyBinding">key binding</a>
+that binds Tab to some command, or use
+<a href="./../../docs/ref/#commands.indentWithTab"><code>indentWithTab</code></a> from the
+<a href="./../../docs/ref/#commands">commands</a> package.</p>
+<pre><code class="language-typescript"><span class="tok-keyword">import</span> <span class="tok-punctuation">{</span><span class="tok-variableName tok-definition">basicSetup</span><span class="tok-punctuation">}</span> <span class="tok-keyword">from</span> <span class="tok-string">&quot;codemirror&quot;</span>
+<span class="tok-keyword">import</span> <span class="tok-punctuation">{</span><span class="tok-variableName tok-definition">EditorView</span><span class="tok-punctuation">,</span> <span class="tok-variableName tok-definition">keymap</span><span class="tok-punctuation">}</span> <span class="tok-keyword">from</span> <span class="tok-string">&quot;@codemirror/view&quot;</span>
+<span class="tok-keyword">import</span> <span class="tok-punctuation">{</span><span class="tok-variableName tok-definition">indentWithTab</span><span class="tok-punctuation">}</span> <span class="tok-keyword">from</span> <span class="tok-string">&quot;@codemirror/commands&quot;</span>
+<span class="tok-keyword">import</span> <span class="tok-punctuation">{</span><span class="tok-variableName tok-definition">javascript</span><span class="tok-punctuation">}</span> <span class="tok-keyword">from</span> <span class="tok-string">&quot;@codemirror/lang-javascript&quot;</span>
+
+<span class="tok-keyword">const</span> <span class="tok-variableName tok-definition">doc</span> <span class="tok-operator">=</span> <span class="tok-string2">`if (true) {
+  console.log(&quot;okay&quot;)
+} else {
+  console.log(&quot;oh no&quot;)
+}
+`</span>
+
+<span class="tok-keyword">new</span> <span class="tok-variableName">EditorView</span><span class="tok-punctuation">(</span><span class="tok-punctuation">{</span>
+  <span class="tok-propertyName tok-definition">doc</span><span class="tok-punctuation">,</span>
+  <span class="tok-propertyName tok-definition">extensions</span><span class="tok-punctuation">:</span> <span class="tok-punctuation">[</span>
+    <span class="tok-variableName">basicSetup</span><span class="tok-punctuation">,</span>
+    <span class="tok-variableName">keymap</span><span class="tok-operator">.</span><span class="tok-propertyName">of</span><span class="tok-punctuation">(</span><span class="tok-punctuation">[</span><span class="tok-variableName">indentWithTab</span><span class="tok-punctuation">]</span><span class="tok-punctuation">)</span><span class="tok-punctuation">,</span>
+    <span class="tok-variableName">javascript</span><span class="tok-punctuation">(</span><span class="tok-punctuation">)</span>
+  <span class="tok-punctuation">]</span><span class="tok-punctuation">,</span>
+  <span class="tok-propertyName tok-definition">parent</span><span class="tok-punctuation">:</span> <span class="tok-variableName">document</span><span class="tok-operator">.</span><span class="tok-propertyName">querySelector</span><span class="tok-punctuation">(</span><span class="tok-string">&quot;#editor&quot;</span><span class="tok-punctuation">)</span>
+<span class="tok-punctuation">}</span><span class="tok-punctuation">)</span>
+</code></pre>
+<p>Try it out:</p>
+<div id=editor></div>
+<textarea style="width: 100%">Press Escape, then Tab to move to this field. Or Escape, Shift-Tab to move to the field before the editor.</textarea>
+<script defer src="./js/codemirror.js"></script>
+<script defer src="./js/tab.js"></script>
+</article><footer>
+  <nav>
+    <div class=navlinks>
+      <a href="http://contributor-covenant.org/version/1/1/0/">Code of Conduct</a>
+      <a href="https://github.com/codemirror/dev/issues">Report an Issue</a>
+    </div>
+  </nav>
+</footer>
+
+</html>

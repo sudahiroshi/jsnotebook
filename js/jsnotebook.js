@@ -138,12 +138,14 @@ const jsnPrint = ( element, string ) => {
 	if( element.className.indexOf( 'console' ) != -1 ) {
 		 element.innerHTML += string + "<br>";
 	}
+    console.log( string );
 }
 
 const jsnError = ( element, string ) => {
     if( element.className.indexOf( 'console' ) != -1 ) {
     	element.innerHTML += "<span class='err'>" + string + "</span><br>";
     }
+    console.log( string );
 }
 
 window.addEventListener('DOMContentLoaded', function() {

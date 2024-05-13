@@ -21,48 +21,50 @@
 まず，以下のようなタグが有ることを想定します．ここで，枠内の文字列＝```value```内の文字列を取得したいとします．
 
 ```html hl
-&lt;iput type="text" value="ここが枠内の文字列" id="input01"&gt;&lt;/input&gt;
+&lt;input type="text" value="ここが枠内の文字列" id="input01"&gt;&lt;/input&gt;
 ```
 
 <input type="text" value="ここが枠内の文字列" id="input01"></input>
 
-そのような場合は，```getElementById```関数を使用して要素を取得し，要素内の```value```の内容を取得するという手順で実行します．
+そのような場合は，```querySelector```関数を使用して要素を取得し，要素内の```value```の内容を取得するという手順で実行します．
 
-```javascript sandbox editable console
+```javascript runnable editable console
 // valueの内容　＝　枠内の文字列を取得します
 
-var value = document.getElementById( "input01" ).value;
+var element = document.querySelector( "#input01" );
+var value = element.value;
 console.log( value );
 ```
 
 同様に```type```の内容を取得するにはどうすれば良いでしょうか？上のプログラムから予想できるとおり，プログラムは以下のようになります．
 
-```javascript sandbox editable console
+```javascript runnable editable console
 // typeを取得します
-var type = document.getElementById( "input01" ).type;
+var type = element.type;
 console.log( type );
 ```
 
 あまり```type```を取得する場面はないと思いますが，独自のパラメータを付けておいてあとで読み取る際などに役に立ちます．
 
-## 要素または要素群を取得する
+## 要素または要素群を取得する関数
 
-以下に，要素または要素群を取得する関数一覧を示します．細かい使用例は次節以降で説明します．
+以下に，要素または要素群を取得する関数一覧を示します．基本的に```querySelector```と```querySelectorAll```を使用することになります．細かい使用例は次節以降で説明します．
 
 関数名 | 複数 | 意味
 --|--|--
+querySelector | | CSSセレクタを指定して要素を取得
+querySelectorAll | ○ | CSSセレクタを指定して要素を取得
 getElementById | | id属性を指定して要素を取得
 getElementsByName | ○ | name属性を指定して要素を取得
 getElementsByClassName | ○ | クラス名を指定して要素を取得
 getElementsByTagName | ○ | タグ名を指定して要素を取得
-querySelector | | CSSセレクタを指定して要素を取得
-querySelectorAll | ○ | CSSセレクタを指定して要素を取得
+
 
 ## 要素を全て取得する
 
 それでは，連続して並んでいる```input```要素を全て取得したい場合はどうすれば良いでしょうか？幾つか手段があるので順に説明します．
 
-例えば以下のようなIDが```input02-form```のform内に4つのラジオボタンが有る場合を考えます．ラジオボタンは上から順にvalueが1〜4で，class名が```input02```，nameが```radio02```であるものとします．
+例えば以下のように，IDが```input02-form```のform内に4つのラジオボタンが有る場合を考えます．ラジオボタンは上から順にvalueが1〜4で，class名が```input02```，nameが```radio02```であるものとします．
 
 ```html hl
 &lt;form id="input02-form"&gt;
@@ -135,7 +137,7 @@ console.log( "最初の要素のvalueは" + radios1[0].value + "です" );
 
 querySelectorAllを使用したサンプルを以下に示します．パラメータはCSSセレクタなので，この場合はタグ名がinputで，さらに大カッコを使いtypeがraioの要素のみを抽出しています．
 
-なお，コメントアウトしている行は，タグ名がinputで，さらに大カッコを使いnameがradio02の要素のみを抽出しています．コメントの位置を変更して，どちらでも要素軍が取得できていることをご確認ください．
+なお，コメントアウトしている行は，タグ名がinputで，さらに大カッコを使いnameがradio02の要素のみを抽出しています．コメントの位置を変更して，どちらでも要素群が取得できていることをご確認ください．
 
 
 ```javascript runnable editable console
@@ -175,7 +177,7 @@ querySelectorを使用すると，以下のように書くことができます�
 ```javascript runnable editable console
 // idがinput02-formの要素を取得→inputタグtypeがradioでcheckedの付いている要素を抽出
 
-var inputform = document.getElementById('input02-form');
+var inputform = document.querySelector('#input02-form');
 var radios3 = inputform.querySelector( 'input[type="radio"]:checked' );
 console.log( radios3.value );
 ```

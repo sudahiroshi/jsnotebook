@@ -313,7 +313,7 @@ console.log( times( 5 ) );
 ここでは，HTML5で定められた描画のための要素であるCanvas要素を使って，お絵描きをします．
 
 ```html hl
-<canvas id="canvas1" width="400" height="400"></canvas>
+&lt;canvas id=&quot;canvas1&quot; width=&quot;400&quot; height=&quot;400&quot;&gt;&lt;/canvas&gt;
 ```
 <canvas id="canvas1" width="400" height="400"></canvas>
 
@@ -337,20 +337,20 @@ var context = element.getContext( '2d' );
 これまで特に説明してきませんでしたが，JavaScriptのプログラムはHTMLの中に記述することができます．
 
 ```html hl
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <script>
-    var element = document.getElementById( 'canvas1' );
-    var context = element.getContext( '2d' );
-  </script>
-</head>
-<body>
-  <canvas id="canvas1" width="400" height="400"></canvas>
-</body>
-</html>
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Document&lt;/title&gt;
+  &lt;script&gt;
+    var element = document.getElementById( &#039;canvas1&#039; );
+    var context = element.getContext( &#039;2d&#039; );
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;canvas id=&quot;canvas1&quot; width=&quot;400&quot; height=&quot;400&quot;&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 ```
 
 <canvas id="canvas1" width="400" height="400"></canvas>
@@ -361,22 +361,22 @@ var context = element.getContext( '2d' );
 そこで，ちょっと面倒ですが以下のように記述します．
 
 ```html hl
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <script>
-    window.addEventListener("load", function() {
-      var element = document.getElementById( 'canvas1' );
-      var context = element.getContext( '2d' );
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Document&lt;/title&gt;
+  &lt;script&gt;
+    window.addEventListener(&quot;load&quot;, function() {
+      var element = document.getElementById( &#039;canvas1&#039; );
+      var context = element.getContext( &#039;2d&#039; );
     });
-  </script>
-</head>
-<body>
-  <canvas id="canvas1" width="400" height="400"></canvas>
-</body>
-</html>
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;canvas id=&quot;canvas1&quot; width=&quot;400&quot; height=&quot;400&quot;&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 ```
 
 大きく違うのは7行目です．
@@ -385,16 +385,16 @@ var context = element.getContext( '2d' );
 次に，実際に描画する処理を加えたソースを示します．
 
 ```html hl
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <script>
-    window.addEventListener("load", function() {
-      var element = document.getElementById( 'canvas1' );
-      var context = element.getContext( '2d' );
-      element.addEventListener( 'click', ev => {
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Document&lt;/title&gt;
+  &lt;script&gt;
+    window.addEventListener(&quot;load&quot;, function() {
+      var element = document.getElementById( &#039;canvas1&#039; );
+      var context = element.getContext( &#039;2d&#039; );
+      element.addEventListener( &#039;click&#039;, ev =&gt; {
         var rect = ev.target.getBoundingClientRect();
         x = ev.clientX - rect.left;
         y = ev.clientY - rect.top;
@@ -404,12 +404,12 @@ var context = element.getContext( '2d' );
         context.stroke();
       })
     });
-  </script>
-</head>
-<body>
-  <canvas id="canvas1" width="400" height="400"></canvas>
-</body>
-</html>
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;canvas id=&quot;canvas1&quot; width=&quot;400&quot; height=&quot;400&quot;&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 ```
 
 基本的にはCanvas要素に対してクリックのイベントを付けてあげて，そのイベント処理の中で座標を取得して点を打っています．
@@ -437,17 +437,17 @@ Canvasに描画するメソッドを以下に示します．
 HTMLファイルから外部JavaScriptを読み込むためには以下の6行目のように書きます．
 
 ```html hl
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  &ltscript src="test1.js"&gt</script>
-</head>
-<body>
-  <canvas id="canvas1" width="400" height="400"></canvas>
-</body>
-</html>
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Document&lt;/title&gt;
+  &amp;ltscript src=&quot;test1.js&quot;&amp;gt&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;canvas id=&quot;canvas1&quot; width=&quot;400&quot; height=&quot;400&quot;&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 ```
 
 これにより，HTMLは文書構造のみを記述することができ，何が書かれているか分かりやすくなりました．
