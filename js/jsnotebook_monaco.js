@@ -308,8 +308,8 @@ window.addEventListener('DOMContentLoaded', function() {
             } else if (elm.tagName === 'TEXTAREA') {
                 content = elm.value;
                 let div = document.createElement('div');
-                div.style.height = elm.style.height || (elm.offsetHeight > 0 ? elm.offsetHeight + 'px') : '150px'; 
-                div.style.width = elm.style.width || (elm.offsetWidth > 0 ? elm.offsetWidth + 'px') : '100%');
+                div.style.height = elm.style.height || (elm.offsetHeight > 0 ? elm.offsetHeight + 'px' : '150px'); 
+                div.style.width = elm.style.width || (elm.offsetWidth > 0 ? elm.offsetWidth + 'px' : '100%');
                 elm.parentNode.insertBefore(div, elm);
                 targetElement = div;
                 originalElementToHide = elm;
