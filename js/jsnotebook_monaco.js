@@ -101,30 +101,41 @@ class JSNotebook {
     }
     setup_executable() {
         //console.log(this.markdown);
-        let pre_tags = this.markdown.querySelectorAll('pre code.javascript');
-        //console.log(pre_tags);
-        require.config({ paths: { vs: "./node_modules/monaco-editor/min/vs" } });
-        require(["vs/editor/editor.main"], () => {
+        let js_code_blocks = this.markdown.querySelectorAll('pre code.javascript');
+        // Query for '.editable' elements *within the current markdown scope*
+        // This prevents re-processing elements if setup_executable is called multiple times on different jsn-md blocks.
+        let specific_editable_elements = this.markdown.querySelectorAll('.editable');
+
+        require.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs" } });
+        require(["vs/editor/editor.main"], (monaco_api) => { // Renamed monaco to monaco_api to avoid conflict if global monaco exists
             let editor;
-            //console.log(pre_tags);
-            pre_tags.forEach( elm => {
-                //console.log(elm);
+
+            // Process javascript code blocks first (specific to jsn-md content)
+            js_code_blocks.forEach( elm => {
+                // Mark as processed by this specific jsn-md block to avoid generic handling
+                elm.dataset.jsnMonacoInitialized = 'true';
+                if(elm.parentNode.tagName === 'PRE') {
+                     elm.parentNode.dataset.jsnMonacoInitialized = 'true';
+                }
+
                 elm.textContent = elm.textContent
                 .replace( /&nbsp;/g," ")
                 .replace( /&lt;/g, "<" )
                 .replace( /&gt;/g, ">")
                 .replace( /<br>/g, "\r\n" );
-                editor = monaco.editor.create(
-                    elm.parentNode,
+                editor = monaco_api.editor.create(
+                    elm.parentNode, 
                     {
                         value: elm.textContent,
                         language: "javascript",
                         lineNumbers: true,
                         scrollBeyondLastLine: false,
                         theme: 'vs-light',
+                        automaticLayout: true,
                     }
                 );
                 elm.parentNode.classList.add(...elm.classList);
+                
                 if( elm.classList.contains("runnable") ) {
                     let runnable = new Runnable( elm.parentNode, editor );
                     this.executable.push( runnable );
@@ -149,14 +160,64 @@ class JSNotebook {
                     }
                     sandbox.add_button();
                 }
-                elm.remove();
+                elm.remove(); 
             });
 
-            // if( elm.className.indexOf( 'runnable') != -1 )   this.executable.push( new Runnable( elm ) );
-            // else if( elm.className.indexOf( 'once') != -1 )   this.executable.push( new Once( elm ) );
-            // else if( elm.className.indexOf( 'sandbox') != -1 )   this.executable.push( new Sandbox( elm ) );
-         });
+            // Process other '.editable' elements *within this specific jsn-md block*
+            specific_editable_elements.forEach(elm => {
+                if (elm.dataset.jsnMonacoInitialized === 'true' || (elm.parentNode.dataset && elm.parentNode.dataset.jsnMonacoInitialized === 'true')) {
+                    return; // Already handled by the js_code_blocks loop or is a parent of one
+                }
+                 // Check if it's a CODE element whose PRE parent was already initialized
+                if (elm.tagName === 'CODE' && elm.parentNode.classList.contains('monaco-editor')) {
+                    return;
+                }
+                // Generic check for monaco editor presence
+                if (elm.classList.contains('monaco-editor') || elm.querySelector('.monaco-editor') || (elm.parentNode && elm.parentNode.classList.contains('monaco-editor'))) {
+                    return;
+                }
+                
+                elm.dataset.jsnMonacoInitialized = 'true'; // Mark as processed
 
+                let language = 'plaintext';
+                if (elm.classList.contains('html') || elm.classList.contains('language-html')) language = 'html';
+                if (elm.classList.contains('css') || elm.classList.contains('language-css')) language = 'css';
+                if (elm.classList.contains('javascript') || elm.classList.contains('language-javascript')) language = 'javascript';
+
+                let editor_container = elm;
+                let original_content = elm.textContent; // Default to textContent
+
+                if (elm.tagName.toLowerCase() !== 'pre') {
+                    editor_container = document.createElement('div');
+                    let height = elm.offsetHeight > 0 ? (elm.offsetHeight + 'px') : '100px';
+                    // For textareas, try to get content from value attribute
+                    if (elm.tagName.toLowerCase() === 'textarea') {
+                        original_content = elm.value;
+                        height = elm.style.height || height; // Prefer textarea's explicit height
+                    }
+                    editor_container.style.height = height;
+                    editor_container.style.width = elm.offsetWidth > 0 ? (elm.offsetWidth + 'px') : '100%';
+                    elm.parentNode.insertBefore(editor_container, elm);
+                    elm.style.display = 'none';
+                } else {
+                    if (elm.textContent.trim() === '') {
+                        elm.textContent = '\n'; 
+                    }
+                }
+                
+                monaco_api.editor.create(
+                    editor_container,
+                    {
+                        value: original_content.trim(),
+                        language: language,
+                        lineNumbers: true,
+                        scrollBeyondLastLine: false,
+                        theme: 'vs-light',
+                        automaticLayout: true,
+                    }
+                );
+            });
+         });
     }
 }
 const jsnPrint = ( element, string ) => {
@@ -172,64 +233,131 @@ const jsnError = ( element, string ) => {
 window.addEventListener('DOMContentLoaded', function() {
     showdown.setFlavor('github');
 
-    // consoleに相当するオブジェクトを入れておく配列
-    // evalするときにグローバル変数でないとエラーになるので，
-    // 回避するためにゴチャゴチャしている
     output = [];
     output_number = 0;
 
-    // jsn-mdタグを拾ってMarkdownへの変換処理をおこなう
     var docs = document.querySelectorAll( 'jsn-md' );
     var conv = new showdown.Converter(  );
-    docs.forEach( function( markdown ) {
-        let jsn = new JSNotebook( markdown, conv );
+    docs.forEach( function( markdown_el ) { // Renamed markdown to markdown_el
+        let jsn = new JSNotebook( markdown_el, conv );
         jsn.md2html();
-        jsn.setup_executable();
+        jsn.setup_executable(); // This handles monaco for jsn-md blocks
     });
 
+    // --- New Generic Monaco Initialization Logic ---
+    require.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs" } });
+    require(["vs/editor/editor.main"], (monaco_api) => { 
+        let general_editable_elements = document.querySelectorAll('.editable, [contentEditable="true"]');
+        general_editable_elements.forEach(elm => {
+            if (elm.dataset.jsnMonacoInitialized === 'true' || elm.closest('[data-jsn-monaco-initialized="true"]')) return;
+            if (elm.classList.contains('monaco-editor') || elm.querySelector('.monaco-editor')) return;
+            if (elm.tagName === 'CODE' && elm.parentNode && elm.parentNode.classList.contains('monaco-editor')) return;
+            if (elm.tagName === 'PRE' && elm.querySelector('.monaco-editor')) return;
+            if (elm.dataset.genericMonacoInitialized === 'true') return;
+
+            // Check if inside jsn-md and should be skipped by generic handler
+            let isInsideJsnMdScope = false;
+            let currentAncestor = elm.parentNode;
+            while(currentAncestor && currentAncestor !== document.body) {
+                if (currentAncestor.tagName === 'JSN-MD') {
+                    isInsideJsnMdScope = true;
+                    break;
+                }
+                currentAncestor = currentAncestor.parentNode;
+            }
+            // If inside a JSN-MD but not picked up by specific jsn-md logic (e.g. not pre code.javascript or .editable within that scope)
+            // then it's ambiguous. For now, let's assume generic handler should skip it to be safe.
+            // This might need refinement if there are valid cases for generic handling inside jsn-md.
+            if (isInsideJsnMdScope) return;
 
 
-    // runnableクラスの付いた要素に実行ボタンを付ける
-    var pres = document.querySelectorAll( '.runnable' );
-    pres.forEach( function( value ) {
-        //console.log( value );
-        let parent = value.parentNode;
-        parent.style.background = "#f8fcfc";
-        parent.style.border = "solid 1px #80a0a0";
+            let language = 'plaintext';
+            let langFoundOnCodeChild = false;
+
+            if (elm.tagName === 'PRE') {
+                const code_el = elm.querySelector(':scope > code');
+                if (code_el) {
+                    const codeClassList = code_el.classList;
+                    if (codeClassList.contains('language-javascript') || codeClassList.contains('javascript')) {
+                        language = 'javascript';
+                        langFoundOnCodeChild = true;
+                    } else if (codeClassList.contains('language-html') || codeClassList.contains('html')) {
+                        language = 'html';
+                        langFoundOnCodeChild = true;
+                    } else if (codeClassList.contains('language-css') || codeClassList.contains('css')) {
+                        language = 'css';
+                        langFoundOnCodeChild = true;
+                    }
+                }
+            }
+
+            if (!langFoundOnCodeChild) { // Fallback to checking the element itself
+                const elmClassList = elm.classList;
+                if (elmClassList.contains('language-javascript') || elmClassList.contains('javascript')) language = 'javascript';
+                else if (elmClassList.contains('language-html') || elmClassList.contains('html')) language = 'html';
+                else if (elmClassList.contains('language-css') || elmClassList.contains('css')) language = 'css';
+            }
+
+            let content = elm.textContent;
+            let targetElement = elm;
+            let originalElementToHide = null;
+
+            if (elm.tagName === 'CODE' && elm.parentNode.tagName === 'PRE') {
+                targetElement = elm.parentNode; 
+                if (targetElement.dataset.genericMonacoInitialized === 'true') return;
+            } else if (elm.tagName === 'TEXTAREA') {
+                content = elm.value;
+                let div = document.createElement('div');
+                div.style.height = elm.style.height || (elm.offsetHeight > 0 ? elm.offsetHeight + 'px') : '150px'; 
+                div.style.width = elm.style.width || (elm.offsetWidth > 0 ? elm.offsetWidth + 'px') : '100%');
+                elm.parentNode.insertBefore(div, elm);
+                targetElement = div;
+                originalElementToHide = elm;
+            }
+            
+            if (targetElement.dataset.genericMonacoInitialized === 'true' || targetElement.classList.contains('monaco-editor') || targetElement.querySelector('.monaco-editor')) {
+                return;
+            }
+
+            monaco_api.editor.create(targetElement, {
+                value: content, // For PRE, textContent is fine. For TEXTAREA, value was used.
+                language: language,
+                lineNumbers: true,
+                scrollBeyondLastLine: false,
+                theme: 'vs-light',
+                automaticLayout: true,
+            });
+            targetElement.dataset.genericMonacoInitialized = 'true'; 
+            if (originalElementToHide) {
+                originalElementToHide.style.display = 'none';
+            }
+            if(elm.contentEditable === 'true' && elm !== targetElement) {
+                 elm.contentEditable = 'false';
+            }
+        });
     });
 
-    // onceクラスの付いた要素に実行ボタンを付ける
-    var pres = document.querySelectorAll( '.once' );
-    pres.forEach( function( value ) {
-        let parent = value.parentNode;
-        parent.style.background = "#f8fcfc";
-        parent.style.border = "solid 1px #80a0a0";
+    document.querySelectorAll( '.runnable, .once, .sandbox' ).forEach( function( value ) {
+        let parent = value.tagName === 'PRE' ? value : (value.parentNode && value.parentNode.tagName === 'PRE' ? value.parentNode : null);
+        if (parent && parent.classList.contains('monaco-editor')) { 
+             parent.style.background = "#f8fcfc";
+             parent.style.border = "solid 1px #80a0a0";
+        } else if (value.classList.contains('monaco-editor')) { 
+             value.style.background = "#f8fcfc";
+             value.style.border = "solid 1px #80a0a0";
+        }
     });
 
-    // sandboxクラスの付いた要素に実行ボタンを付ける
-    var pres = document.querySelectorAll( '.sandbox' );
-    pres.forEach( function( value ) {
-        let parent = value.parentNode;
-        parent.style.background = "#f8fcfc";
-        parent.style.border = "solid 1px #80a0a0";
-    });
-
-    // editableクラスの付いた要素を編集可能にする
-    // var edit = document.querySelectorAll( '.editable' );
-    // edit.forEach( function( value ) {
-    //     value.contentEditable = true;
-    // });
-
-    // hlクラスの付いた要素にSyntaxHighliteを行う
-    var code = document.querySelectorAll( 'pre code.hl, pre code.html' );
-    code.forEach( function( block ) {
+    var hl_code = document.querySelectorAll( 'pre code.hl, pre code.html' );
+    hl_code.forEach( function( block ) {
+        if (block.closest('.monaco-editor')) return;
         block.innerHTML = block.innerHTML.replace( /&amp;/g, '&' ).replace( / /g, '&nbsp;' );
         hljs.highlightBlock( block );
     });
 
-    // Mermaidの要素を修正する
-    var code = document.querySelectorAll( 'pre code.mermaid' );
-    code.forEach( function(block) {
+    var mermaid_code = document.querySelectorAll( 'pre code.mermaid' );
+    mermaid_code.forEach( function(block) {
+        if (block.closest('.monaco-editor')) return;
         block.innerHTML = block.innerHTML.replace( /<br>/g, "\r\n" )
         .replace( /&nbsp;/g," ").replace( /&amp;/g, '&' ).replace( /&lt;/g, '<' ).replace( /&gt;/g, '>'  );
     })
